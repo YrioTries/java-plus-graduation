@@ -28,8 +28,6 @@ services:
       SPRING_DATASOURCE_USERNAME: dbuser
       SPRING_DATASOURCE_PASSWORD: 12345
       SPRING_PROFILES_ACTIVE: docker
-    ports:
-      - "9090:9090"
     depends_on:
       stats-db:
         condition: service_healthy
@@ -57,8 +55,6 @@ services:
       context: ./core/main-service
       dockerfile: Dockerfile
     container_name: main-service
-    ports:
-      - "8080:8080"
     depends_on:
       main-service-db:
         condition: service_healthy
