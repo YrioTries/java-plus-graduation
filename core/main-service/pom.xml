@@ -10,9 +10,9 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>main-svc</artifactId>
+    <artifactId>main-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>main-svc</name>
+    <name>main-service</name>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

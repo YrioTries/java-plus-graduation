@@ -10,7 +10,7 @@
     </parent>
 
     <modules>
-        <module>main-svc</module>
+        <module>main-service</module>
     </modules>
 
     <artifactId>core</artifactId>

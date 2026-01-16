@@ -12,7 +12,6 @@ services:
       - "5432:5432"
     volumes:
       - stats-db-data:/var/lib/postgresql/data
-      - ./stats/server/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U dbuser -d explorewithme"]
       interval: 10s
@@ -36,9 +35,9 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  main-svc-db:
+  main-service-db:
     image: postgres:16.1
-    container_name: main-svc-db
+    container_name: main-service-db
     environment:
       POSTGRES_DB: main
       POSTGRES_USER: dbuser
@@ -47,7 +46,6 @@ services:
       - "5433:5432"
     volumes:
       - main-db-data:/var/lib/postgresql/data
-      - ./core/main-svc/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U dbuser -d main"]
       interval: 10s
@@ -56,18 +54,18 @@ services:
 
   main-service:
     build:
-      context: ./main-svc
+      context: ./core/main-service
       dockerfile: Dockerfile
     container_name: main-service
     ports:
       - "8080:8080"
     depends_on:
-      main-svc-db:
+      main-service-db:
         condition: service_healthy
       stats-server:
         condition: service_started
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://main-svc-db:5432/main
+      SPRING_DATASOURCE_URL: jdbc:postgresql://main-service-db:5432/main
       SPRING_DATASOURCE_USERNAME: dbuser
       SPRING_DATASOURCE_PASSWORD: 12345
       SPRING_PROFILES_ACTIVE: docker
