@@ -1,14 +1,79 @@
-services:
-  stats-server:
-    ports:
-      - "9090:9090"
+version: '3.8'
 
+services:
   stats-db:
     image: postgres:16.1
+    container_name: stats-db
+    environment:
+      POSTGRES_DB: explorewithme
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5432:5432"
+    volumes:
+      - stats-db-data:/var/lib/postgresql/data
+      - ./stats/server/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser -d explorewithme"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  ewm-service:
+  stats-server:
+    build:
+      context: stats/server
+      dockerfile: Dockerfile
+    container_name: stats-server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/explorewithme
+      SPRING_DATASOURCE_USERNAME: dbuser
+      SPRING_DATASOURCE_PASSWORD: 12345
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "9090:9090"
+    depends_on:
+      stats-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  main-svc-db:
+    image: postgres:16.1
+    container_name: main-svc-db
+    environment:
+      POSTGRES_DB: main
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5433:5432"
+    volumes:
+      - main-db-data:/var/lib/postgresql/data
+      - ./core/main-svc/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser -d main"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  main-service:
+    build:
+      context: ./main-svc
+      dockerfile: Dockerfile
+    container_name: main-service
     ports:
       - "8080:8080"
+    depends_on:
+      main-svc-db:
+        condition: service_healthy
+      stats-server:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://main-svc-db:5432/main
+      SPRING_DATASOURCE_USERNAME: dbuser
+      SPRING_DATASOURCE_PASSWORD: 12345
+      SPRING_PROFILES_ACTIVE: docker
+      STATS_SERVER_URL: http://stats-server:9090
+    restart: unless-stopped
 
-  ewm-db:
-    image: postgres:16.1
+volumes:
+  stats-db-data:
+  main-db-data:

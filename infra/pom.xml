@@ -9,7 +9,6 @@
     </parent>
 
     <name>infra</name>
-
     <artifactId>infra</artifactId>
     <packaging>pom</packaging>
 
