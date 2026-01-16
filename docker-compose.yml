@@ -1,6 +1,22 @@
 version: '3.8'
 
 services:
+  discovery-server:
+    build: discovery-server
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    restart: unless-stopped
+
+  config-server:
+    build: config-server
+    container_name: config-server
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - discovery-server
+    restart: unless-stopped
+
   stats-db:
     image: postgres:16.1
     container_name: stats-db
@@ -74,22 +90,6 @@ services:
       SPRING_DATASOURCE_PASSWORD: 12345
       SPRING_PROFILES_ACTIVE: docker
       STATS_SERVER_URL: http://stats-server:9090
-    restart: unless-stopped
-
-  discovery-server:
-    build: discovery-server
-    container_name: discovery-server
-    ports:
-      - "8761:8761"
-    restart: unless-stopped
-
-  config-server:
-    build: config-server
-    container_name: config-server
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-    depends_on:
-      - discovery-server
     restart: unless-stopped
 
 volumes:
