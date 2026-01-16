@@ -81,6 +81,7 @@ services:
     container_name: discovery-server
     ports:
       - "8761:8761"
+    restart: unless-stopped
 
   config-server:
     build: config-server
@@ -89,6 +90,7 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
       - discovery-server
+    restart: unless-stopped
 
 volumes:
   stats-db-data:
