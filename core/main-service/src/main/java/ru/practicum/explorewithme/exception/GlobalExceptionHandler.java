@@ -52,7 +52,10 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler({ConflictException.class, DataIntegrityViolationException.class})
+    @ExceptionHandler({
+            ConflictException.class,
+            DataIntegrityViolationException.class
+    })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handlerValidationException(Exception e) {
         log.debug("Получен статус 409 CONFLICT {}", e.getMessage());
