@@ -88,8 +88,7 @@ public class PublicEventServiceImpl implements PublicEventService {
         EventFullDto eventDto = eventMapper.toEventFullDto(event);
 
         Map<Long, Long> views = getEventsViews(List.of(event));
-        Long view = views.getOrDefault(id, 0L);
-        eventDto.setViews(view + 1);
+        eventDto.setViews(views.getOrDefault(id, 0L));
 
         return eventDto;
     }
