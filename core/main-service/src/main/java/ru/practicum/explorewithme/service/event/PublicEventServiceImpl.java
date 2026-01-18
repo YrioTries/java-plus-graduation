@@ -1,9 +1,8 @@
 package ru.practicum.explorewithme.service.event;
 
-import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -27,13 +26,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PublicEventServiceImpl implements PublicEventService {
-    @Autowired
-    private final EntityManager entityManager;
-
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
 
@@ -99,9 +96,6 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .timestamp(LocalDateTime.now())
                 .build());
 
-        entityManager.flush();
-        entityManager.clear();
-
         EventFullDto eventDto = eventMapper.toEventFullDto(event);
 
         Map<Long, Long> views = getEventsViews(List.of(event));
@@ -118,24 +112,27 @@ public class PublicEventServiceImpl implements PublicEventService {
 
         LocalDateTime startDate = events
                 .stream()
-                .map(Event::getCreatedOn)
+                .map(Event::getPublishedOn)
+                .filter(Objects::nonNull)
                 .min(LocalDateTime::compareTo)
-                .orElse(null);
+                .orElse(LocalDateTime.now().minusYears(1));
 
         Map<Long, Long> viewStats = new HashMap<>();
-        if (startDate != null) {
+        try {
             LocalDateTime endDate = LocalDateTime.now();
-            if (startDate.isAfter(endDate)) {
-                throw new BadRequestException("Start date is after end date");
-            }
             List<StatResponseDto> stats = statsClient.getStats(startDate, endDate,
                     uris, true);
             viewStats = stats
                     .stream()
                     .filter(s -> s.getUri().startsWith("/events/"))
-                    .collect(Collectors.toMap(s -> Long.parseLong(s.getUri().substring("/events/".length())),
-                            StatResponseDto::getHits));
+                    .collect(Collectors.toMap(
+                            s -> Long.parseLong(s.getUri().substring("/events/".length())),
+                            StatResponseDto::getHits
+                    ));
+        } catch (Exception e) {
+            log.error("Error getting stats: {}", e.getMessage());
         }
+
         return viewStats;
     }
 
