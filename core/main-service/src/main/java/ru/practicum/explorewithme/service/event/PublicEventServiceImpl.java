@@ -1,7 +1,9 @@
 package ru.practicum.explorewithme.service.event;
 
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PublicEventServiceImpl implements PublicEventService {
+    @Autowired
+    private final EntityManager entityManager;
+
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
 
@@ -76,7 +81,6 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .toList();
     }
 
-
     @Override
     @Transactional
     public EventFullDto getEventById(Long id, HttpServletRequest request) {
@@ -95,11 +99,8 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .timestamp(LocalDateTime.now())
                 .build());
 
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        entityManager.flush();
+        entityManager.clear();
 
         EventFullDto eventDto = eventMapper.toEventFullDto(event);
 
@@ -115,20 +116,26 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .map(event -> String.format("/events/%s", event.getId()))
                 .toList();
 
-        LocalDateTime startDate = LocalDateTime.now().minusDays(365);
-        LocalDateTime endDate = LocalDateTime.now();
+        LocalDateTime startDate = events
+                .stream()
+                .map(Event::getCreatedOn)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
 
         Map<Long, Long> viewStats = new HashMap<>();
-
-        List<StatResponseDto> stats = statsClient.getStats(startDate, endDate, uris, true);
-        viewStats = stats
-                .stream()
-                .filter(s -> s.getUri().startsWith("/events/"))
-                .collect(Collectors.toMap(
-                        s -> Long.parseLong(s.getUri().substring("/events/".length())),
-                        StatResponseDto::getHits
-                ));
-
+        if (startDate != null) {
+            LocalDateTime endDate = LocalDateTime.now();
+            if (startDate.isAfter(endDate)) {
+                throw new BadRequestException("Start date is after end date");
+            }
+            List<StatResponseDto> stats = statsClient.getStats(startDate, endDate,
+                    uris, true);
+            viewStats = stats
+                    .stream()
+                    .filter(s -> s.getUri().startsWith("/events/"))
+                    .collect(Collectors.toMap(s -> Long.parseLong(s.getUri().substring("/events/".length())),
+                            StatResponseDto::getHits));
+        }
         return viewStats;
     }
 
