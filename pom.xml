@@ -10,9 +10,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
-	<name>Explore With Me</name>
-
 	<groupId>ru.practicum</groupId>
+	<name>java-plus-graduation</name>
 	<artifactId>java-plus-graduation</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
@@ -24,39 +23,58 @@
 	</modules>
 
 	<properties>
+		<!-- Java environment settings -->
 		<java.version>21</java.version>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
 		<spring.boot.version>3.3.0</spring.boot.version>
+
+		<!-- Core dependencies versions -->
 		<postgresql.version>42.7.3</postgresql.version>
-		<h2.version>2.2.224</h2.version>
 		<hamcrest.version>2.2</hamcrest.version>
 		<lombok.version>1.18.32</lombok.version>
 		<jakarta.validation.version>3.0.2</jakarta.validation.version>
 
+		<!-- Spring Cloud versions -->
+		<spring-cloud-dependencies.version>2023.0.3</spring-cloud-dependencies.version>
+		<spring-cloud-starter-circuitbreaker-resilience4j.version>3.1.2</spring-cloud-starter-circuitbreaker-resilience4j.version>
+
+		<!-- Messaging & Serialization -->
 		<avro.version>1.11.3</avro.version>
 		<kafka-clients.version>3.6.1</kafka-clients.version>
+
+		<!-- API Documentation -->
 		<springdoc-openapi-starter.version>2.6.0</springdoc-openapi-starter.version>
+
+		<!-- gRPC & Protobuf -->
 		<grpc-spring-boot-starter.version>3.1.0.RELEASE</grpc-spring-boot-starter.version>
 		<protobuf.version>3.23.4</protobuf.version>
 		<grpc.version>1.63.0</grpc.version>
-		<spring-cloud-dependencies.version>2023.0.3</spring-cloud-dependencies.version>
-		<spring-cloud-starter-circuitbreaker-resilience4j.version>3.1.2</spring-cloud-starter-circuitbreaker-resilience4j.version>
+
+		<!-- Code Generation -->
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
-		<postgresql.version>42.7.3</postgresql.version>
 
-		<!--       Plugins       -->
+		<!-- ========================================================================== -->
+		<!-- MAVEN PLUGINS VERSIONS -->
+		<!-- ========================================================================== -->
+
+		<!-- Compiler & Build -->
 		<maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
 		<maven.surefire.plugin.version>3.1.2</maven.surefire.plugin.version>
+
+		<!-- Code Quality & Analysis -->
 		<spotbugs.maven.plugin.version>4.8.5.0</spotbugs.maven.plugin.version>
 		<jacoco.maven.plugin.version>0.8.12</jacoco.maven.plugin.version>
-
 		<maven.checkstyle.plugin.version>3.1.2</maven.checkstyle.plugin.version>
 		<checkstyle.version>10.3</checkstyle.version>
+
+		<!-- Code Generation Plugins -->
 		<avro-maven-plugin.version>${avro.version}</avro-maven-plugin.version>
 		<protobuf-plugin.version>2.4.0</protobuf-plugin.version>
 	</properties>
+
 
 	<dependencyManagement>
 		<dependencies>
@@ -372,12 +390,6 @@
 							</path>
 						</annotationProcessorPaths>
 					</configuration>
-				</plugin>
-
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>${maven-compiler-plugin.version}</version>
 				</plugin>
 
 				<plugin>
