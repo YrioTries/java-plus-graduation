@@ -1,40 +1,26 @@
 package ru.practicum;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.StringJoiner;
 
 @Slf4j
-@Component
 public class StatsClient {
-    private final String serverUrl;
     private final RestClient restClient;
 
-    public StatsClient(@Value("${stats-server.url}") String serverUrl, RestClient restClient) {
-        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout((int) Duration.ofSeconds(5).toMillis());
-        requestFactory.setReadTimeout((int) Duration.ofSeconds(5).toMillis());
-        this.serverUrl = serverUrl;
-        this.restClient = RestClient.builder()
-                .baseUrl(serverUrl)
-                .requestFactory(requestFactory)
-                .build();
+    public StatsClient(RestClient restClient) {
+        this.restClient = restClient;
     }
 
     public void hit(EndpointHitDto endpointHitDto) {
-        String url = serverUrl + "/hit";
         try {
             restClient.post()
-                    .uri(url)
+                    .uri("/hit")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(endpointHitDto)
                     .retrieve()
@@ -53,9 +39,8 @@ public class StatsClient {
             uris.forEach(uriJoiner::add);
         }
 
-        String url = String.format(
-                "%s/stats?start=%s&end=%s&unique=%s&uris=%s",
-                serverUrl,
+        String uri = String.format(
+                "/stats?start=%s&end=%s&unique=%s&uris=%s",
                 start.format(formatter),
                 end.format(formatter),
                 unique,
@@ -64,14 +49,16 @@ public class StatsClient {
 
         try {
             StatResponseDto[] response = restClient.get()
-                    .uri(url)
+                    .uri(uri)
                     .retrieve()
                     .body(StatResponseDto[].class);
             log.info("Статистика успешно получена от сервиса");
             return List.of(response);
+
         } catch (Exception e) {
             log.error("Ошибка при получении статистики от сервиса: {}", e.getMessage());
             return List.of();
         }
     }
 }
+
