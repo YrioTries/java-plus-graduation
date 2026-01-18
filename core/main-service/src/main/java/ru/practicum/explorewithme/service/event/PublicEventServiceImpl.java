@@ -85,6 +85,9 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .timestamp(LocalDateTime.now())
                 .build());
 
+        event.setViews(event.getViews() + 1);
+        eventRepository.save(event);
+
         EventFullDto eventDto = eventMapper.toEventFullDto(event);
 
         Map<Long, Long> views = getEventsViews(List.of(event));
