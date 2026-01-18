@@ -1,7 +1,7 @@
 package ru.practicum.explorewithme.service.event;
 
-import ru.practicum.explorewithme.dto.event.EventFullDto;
-import ru.practicum.explorewithme.dto.event.UpdateEventAdminRequest;
+import ru.practicum.explorewithme.model.dto.event.EventFullDto;
+import ru.practicum.explorewithme.model.dto.event.UpdateEventAdminRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;

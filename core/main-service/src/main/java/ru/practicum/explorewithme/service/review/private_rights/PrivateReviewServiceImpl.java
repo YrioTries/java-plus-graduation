@@ -3,18 +3,18 @@ package ru.practicum.explorewithme.service.review.private_rights;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.explorewithme.dto.review.NewReviewDto;
-import ru.practicum.explorewithme.dto.review.ReviewDto;
-import ru.practicum.explorewithme.dto.review.UpdateReviewDto;
-import ru.practicum.explorewithme.enums.EventState;
-import ru.practicum.explorewithme.enums.RequestStatus;
+import ru.practicum.explorewithme.model.dto.review.NewReviewDto;
+import ru.practicum.explorewithme.model.dto.review.ReviewDto;
+import ru.practicum.explorewithme.model.dto.review.UpdateReviewDto;
+import ru.practicum.explorewithme.model.enums.EventState;
+import ru.practicum.explorewithme.model.enums.RequestStatus;
 import ru.practicum.explorewithme.exception.ConflictException;
 import ru.practicum.explorewithme.exception.NotFoundException;
-import ru.practicum.explorewithme.mapper.ReviewMapper;
-import ru.practicum.explorewithme.model.Event;
-import ru.practicum.explorewithme.model.ParticipationRequest;
-import ru.practicum.explorewithme.model.Review;
-import ru.practicum.explorewithme.model.User;
+import ru.practicum.explorewithme.model.mapper.ReviewMapper;
+import ru.practicum.explorewithme.model.dao.EventDao;
+import ru.practicum.explorewithme.model.dao.ParticipationRequestDao;
+import ru.practicum.explorewithme.model.dao.ReviewDao;
+import ru.practicum.explorewithme.model.dao.UserDao;
 import ru.practicum.explorewithme.repository.EventRepository;
 import ru.practicum.explorewithme.repository.ParticipationRequestRepository;
 import ru.practicum.explorewithme.repository.ReviewRepository;
@@ -37,19 +37,19 @@ public class PrivateReviewServiceImpl implements PrivateReviewService {
     @Override
     @Transactional
     public ReviewDto addReview(Long userId, Long eventId, NewReviewDto dto) {
-        User user = userRepository.findById(userId)
+        UserDao user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователя с id=" + userId + " нет в БД!"));
-        Event event = eventRepository.findById(eventId)
+        EventDao event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Ивента с id=" + eventId + " нет в БД!"));
         if (reviewRepository.findByEventIdAndAuthorId(eventId, userId).isPresent()) {
             throw new ConflictException("Юзер с id=" + userId + " уже написал отзыв к ивенту с id=" + eventId + "!");
         }
         verifyReview(user, event);
-        Review review = reviewMapper.toReview(dto);
+        ReviewDao review = reviewMapper.toReview(dto);
         review.setAuthor(user);
         review.setEvent(event);
         review.setCreatedOn(LocalDateTime.now());
-        Review savedReview = reviewRepository.save(review);
+        ReviewDao savedReview = reviewRepository.save(review);
         return reviewMapper.toReviewDto(savedReview);
     }
 
@@ -59,7 +59,7 @@ public class PrivateReviewServiceImpl implements PrivateReviewService {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Пользователя с id=" + userId + " нет в БД!");
         }
-        Review review = reviewRepository.findById(reviewId)
+        ReviewDao review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new NotFoundException("Отзыва с id=" + reviewId + " нет в БД!"));
         if (!review.getAuthor().getId().equals(userId)) {
             throw new ConflictException("Пользователь не является автором отзыва");
@@ -69,16 +69,16 @@ public class PrivateReviewServiceImpl implements PrivateReviewService {
         }
         review.setText(dto.getText());
         review.setLastUpdatedOn(LocalDateTime.now());
-        Review updatedReview = reviewRepository.save(review);
+        ReviewDao updatedReview = reviewRepository.save(review);
         return reviewMapper.toReviewDto(updatedReview);
     }
 
     @Override
     @Transactional
     public void deleteReviewByAuthor(Long userId, Long reviewId) {
-        User user = userRepository.findById(userId)
+        UserDao user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователя с id=" + userId + " нет в БД!"));
-        Review review = reviewRepository.findById(reviewId)
+        ReviewDao review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new NotFoundException("Отзыва с id=" + reviewId + " нет в БД!"));
         if (!user.getId().equals(review.getAuthor().getId())) {
             throw new ConflictException("Пользователь не является автором отзыва");
@@ -91,7 +91,7 @@ public class PrivateReviewServiceImpl implements PrivateReviewService {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Пользователя с id=" + userId + " нет в БД!");
         }
-        Review review = reviewRepository.findByIdAndAuthorId(reviewId, userId)
+        ReviewDao review = reviewRepository.findByIdAndAuthorId(reviewId, userId)
                 .orElseThrow(() -> new NotFoundException("Юзер с id=" + reviewId + " не писал отзыв с id=" + reviewId + "!"));
         return reviewMapper.toReviewDto(review);
     }
@@ -107,7 +107,7 @@ public class PrivateReviewServiceImpl implements PrivateReviewService {
                 .toList();
     }
 
-    private void verifyReview(User user, Event event) {
+    private void verifyReview(UserDao user, EventDao event) {
         if (user.getId().equals(event.getInitiator().getId())) {
             throw new ConflictException("Инициатор ивента не может оставлять отзыв на свой ивент!");
         }
@@ -117,7 +117,7 @@ public class PrivateReviewServiceImpl implements PrivateReviewService {
         if (!event.getEventDate().plusHours(1).isBefore(LocalDateTime.now())) {
             throw new ConflictException("Нельзя оставить отзыв на ивент, который ещё не закончился!");
         }
-        ParticipationRequest request = requestRepository.findByEventIdAndRequesterId(event.getId(), user.getId())
+        ParticipationRequestDao request = requestRepository.findByEventIdAndRequesterId(event.getId(), user.getId())
                 .orElseThrow(() -> new NotFoundException("Заявки юзера с id=" + user.getId() + " на участие в ивенте " +
                         "с id=" + event + " нет в БД!"));
         if (!request.getStatus().equals(RequestStatus.CONFIRMED)) {

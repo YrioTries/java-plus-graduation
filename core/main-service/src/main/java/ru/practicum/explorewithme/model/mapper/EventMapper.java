@@ -1,0 +1,76 @@
+package ru.practicum.explorewithme.model.mapper;
+
+import org.mapstruct.*;
+import ru.practicum.explorewithme.model.dto.LocationDto;
+import ru.practicum.explorewithme.model.dto.event.EventFullDto;
+import ru.practicum.explorewithme.model.dto.event.EventShortDto;
+import ru.practicum.explorewithme.model.dto.event.NewEventDto;
+import ru.practicum.explorewithme.model.dao.EventDao;
+import ru.practicum.explorewithme.model.dao.LocationDao;
+
+@Mapper(componentModel = "spring")
+public interface EventMapper {
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "initiator", ignore = true)
+    @Mapping(target = "confirmedRequests", ignore = true)
+    @Mapping(target = "createdOn", ignore = true)
+    @Mapping(target = "publishedOn", ignore = true)
+    @Mapping(target = "state", ignore = true)
+    @Mapping(target = "views", ignore = true)
+    EventDao toEvent(NewEventDto newEventDto);
+
+    @Mapping(target = "category")
+    @Mapping(target = "initiator")
+    EventFullDto toEventFullDto(EventDao event);
+
+    @Mapping(target = "category")
+    @Mapping(target = "initiator")
+    EventShortDto toEventShortDto(EventDao event);
+
+    default LocationDao toLocation(LocationDto dto) {
+        if (dto == null) {
+            return null;
+        }
+        LocationDao location = new LocationDao();
+        location.setLat(dto.getLat());
+        location.setLon(dto.getLon());
+        return location;
+    }
+
+    @AfterMapping
+    default void setDefaultValues(@MappingTarget EventDao event, NewEventDto newEventDto) {
+        if (newEventDto.getPaid() == null) {
+            event.setPaid(false);
+        }
+        if (newEventDto.getParticipantLimit() == null) {
+            event.setParticipantLimit(0);
+        }
+        if (newEventDto.getRequestModeration() == null) {
+            event.setRequestModeration(true);
+        }
+    }
+
+    default EventFullDto toEventFullDtoWithDetails(EventDao event, CategoryMapper categoryMapper, UserMapper userMapper) {
+        EventFullDto dto = toEventFullDto(event);
+        if (event.getCategory() != null) {
+            dto.setCategory(categoryMapper.toCategoryDto(event.getCategory()));
+        }
+        if (event.getInitiator() != null) {
+            dto.setInitiator(userMapper.toUserShortDto(event.getInitiator()));
+        }
+        return dto;
+    }
+
+    default EventShortDto toEventShortDtoWithDetails(EventDao event, CategoryMapper categoryMapper, UserMapper userMapper) {
+        EventShortDto dto = toEventShortDto(event);
+        if (event.getCategory() != null) {
+            dto.setCategory(categoryMapper.toCategoryDto(event.getCategory()));
+        }
+        if (event.getInitiator() != null) {
+            dto.setInitiator(userMapper.toUserShortDto(event.getInitiator()));
+        }
+        return dto;
+    }
+}

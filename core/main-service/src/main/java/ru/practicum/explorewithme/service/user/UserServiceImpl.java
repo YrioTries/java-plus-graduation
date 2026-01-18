@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.explorewithme.dto.user.NewUserRequest;
-import ru.practicum.explorewithme.dto.user.UserDto;
+import ru.practicum.explorewithme.model.dto.user.NewUserRequest;
+import ru.practicum.explorewithme.model.dto.user.UserDto;
 import ru.practicum.explorewithme.exception.ConflictException;
 import ru.practicum.explorewithme.exception.NotFoundException;
-import ru.practicum.explorewithme.mapper.UserMapper;
-import ru.practicum.explorewithme.model.User;
+import ru.practicum.explorewithme.model.mapper.UserMapper;
+import ru.practicum.explorewithme.model.dao.UserDao;
 import ru.practicum.explorewithme.repository.UserRepository;
 
 import java.util.List;
@@ -41,8 +41,8 @@ public class UserServiceImpl implements UserService {
             throw new ConflictException("Email must be unique");
         }
 
-        User user = userMapper.toUser(newUserRequest);
-        User savedUser = userRepository.save(user);
+        UserDao user = userMapper.toUser(newUserRequest);
+        UserDao savedUser = userRepository.save(user);
         return userMapper.toUserDto(savedUser);
     }
 

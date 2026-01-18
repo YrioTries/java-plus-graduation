@@ -7,18 +7,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.StatResponseDto;
 import ru.practicum.StatsClient;
-import ru.practicum.explorewithme.dto.event.EventFullDto;
-import ru.practicum.explorewithme.dto.event.UpdateEventAdminRequest;
-import ru.practicum.explorewithme.enums.EventState;
-import ru.practicum.explorewithme.enums.RequestStatus;
+import ru.practicum.explorewithme.model.dao.LocationDao;
+import ru.practicum.explorewithme.model.dto.event.EventFullDto;
+import ru.practicum.explorewithme.model.dto.event.UpdateEventAdminRequest;
+import ru.practicum.explorewithme.model.enums.EventState;
+import ru.practicum.explorewithme.model.enums.RequestStatus;
 import ru.practicum.explorewithme.exception.ConflictException;
 import ru.practicum.explorewithme.exception.NotFoundException;
-import ru.practicum.explorewithme.mapper.CategoryMapper;
-import ru.practicum.explorewithme.mapper.EventMapper;
-import ru.practicum.explorewithme.mapper.UserMapper;
-import ru.practicum.explorewithme.model.Category;
-import ru.practicum.explorewithme.model.Event;
-import ru.practicum.explorewithme.model.ParticipationRequest;
+import ru.practicum.explorewithme.model.mapper.CategoryMapper;
+import ru.practicum.explorewithme.model.mapper.EventMapper;
+import ru.practicum.explorewithme.model.mapper.UserMapper;
+import ru.practicum.explorewithme.model.dao.CategoryDao;
+import ru.practicum.explorewithme.model.dao.EventDao;
+import ru.practicum.explorewithme.model.dao.ParticipationRequestDao;
 import ru.practicum.explorewithme.repository.CategoryRepository;
 import ru.practicum.explorewithme.repository.EventRepository;
 import ru.practicum.explorewithme.repository.ParticipationRequestRepository;
@@ -47,7 +48,7 @@ public class EventServiceImpl implements EventService {
     public List<EventFullDto> getEventsForAdmin(List<Long> users, List<String> states,
                                                 List<Long> categories, LocalDateTime rangeStart,
                                                 LocalDateTime rangeEnd, Pageable pageable) {
-        Specification<Event> spec = Specification.where(null);
+        Specification<EventDao> spec = Specification.where(null);
         if (users != null && !users.isEmpty()) {
             spec = spec.and(((root, query, criteriaBuilder) ->
                     root.get("initiator").get("id").in(users)));
@@ -68,9 +69,9 @@ public class EventServiceImpl implements EventService {
             spec = spec.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.greaterThanOrEqualTo(root.get("eventDate"), rangeStart));
         }
-        List<Event> events = eventRepository.findAll(spec, pageable).toList();
+        List<EventDao> events = eventRepository.findAll(spec, pageable).toList();
         Map<Long, Long> views = getEventsViews(events);
-        Map<Long, List<ParticipationRequest>> confRequests = getConfirmedRequestsCount(events);
+        Map<Long, List<ParticipationRequestDao>> confRequests = getConfirmedRequestsCount(events);
         return events.stream()
                 .map(e -> eventMapper.toEventFullDtoWithDetails(e, categoryMapper, userMapper))
                 .peek(dto -> dto.setViews(views.getOrDefault(dto.getId(), 0L)))
@@ -83,7 +84,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequest updateRequest) {
-        Event event = eventRepository.findById(eventId)
+        EventDao event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
 
         if (updateRequest.getStateAction() != null) {
@@ -105,16 +106,16 @@ public class EventServiceImpl implements EventService {
         }
 
         updateEventFields(event, updateRequest);
-        Event updatedEvent = eventRepository.save(event);
+        EventDao updatedEvent = eventRepository.save(event);
         return eventMapper.toEventFullDto(updatedEvent);
     }
 
-    private void updateEventFields(Event event, UpdateEventAdminRequest updateRequest) {
+    private void updateEventFields(EventDao event, UpdateEventAdminRequest updateRequest) {
         if (updateRequest.getAnnotation() != null) {
             event.setAnnotation(updateRequest.getAnnotation());
         }
         if (updateRequest.getCategory() != null) {
-            Category category = categoryRepository.findById(updateRequest.getCategory())
+            CategoryDao category = categoryRepository.findById(updateRequest.getCategory())
                     .orElseThrow(() -> new NotFoundException("Category not found"));
             event.setCategory(category);
         }
@@ -125,7 +126,7 @@ public class EventServiceImpl implements EventService {
             event.setEventDate(updateRequest.getEventDate());
         }
         if (updateRequest.getLocation() != null) {
-            ru.practicum.explorewithme.model.Location location =
+            LocationDao location =
                     eventMapper.toLocation(updateRequest.getLocation());
             event.setLocation(location);
         }
@@ -143,14 +144,14 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    private Map<Long, Long> getEventsViews(List<Event> events) {
+    private Map<Long, Long> getEventsViews(List<EventDao> events) {
         List<String> uris = events
                 .stream()
                 .map(event -> String.format("/events/%s", event.getId()))
                 .toList();
         LocalDateTime startDate = events
                 .stream()
-                .map(Event::getCreatedOn)
+                .map(EventDao::getCreatedOn)
                 .min(LocalDateTime::compareTo)
                 .orElse(null);
         Map<Long, Long> viewStats = new HashMap<>();
@@ -166,9 +167,9 @@ public class EventServiceImpl implements EventService {
         return viewStats;
     }
 
-    private Map<Long, List<ParticipationRequest>> getConfirmedRequestsCount(List<Event> events) {
-        List<ParticipationRequest> requests = requestRepository.findAllByEventIdInAndStatus(events
-                .stream().map(Event::getId).collect(Collectors.toList()), RequestStatus.CONFIRMED);
+    private Map<Long, List<ParticipationRequestDao>> getConfirmedRequestsCount(List<EventDao> events) {
+        List<ParticipationRequestDao> requests = requestRepository.findAllByEventIdInAndStatus(events
+                .stream().map(EventDao::getId).collect(Collectors.toList()), RequestStatus.CONFIRMED);
         return requests.stream().collect(Collectors.groupingBy(r -> r.getEvent().getId()));
     }
 

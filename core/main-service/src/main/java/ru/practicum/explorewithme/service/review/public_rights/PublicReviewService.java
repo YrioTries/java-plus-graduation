@@ -1,6 +1,6 @@
 package ru.practicum.explorewithme.service.review.public_rights;
 
-import ru.practicum.explorewithme.dto.review.ReviewDto;
+import ru.practicum.explorewithme.model.dto.review.ReviewDto;
 
 import java.util.List;
 

@@ -4,13 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.explorewithme.dto.compilation.CompilationDto;
-import ru.practicum.explorewithme.dto.compilation.NewCompilationDto;
-import ru.practicum.explorewithme.dto.compilation.UpdateCompilationRequest;
+import ru.practicum.explorewithme.model.dto.compilation.CompilationDto;
+import ru.practicum.explorewithme.model.dto.compilation.NewCompilationDto;
+import ru.practicum.explorewithme.model.dto.compilation.UpdateCompilationRequest;
 import ru.practicum.explorewithme.exception.NotFoundException;
-import ru.practicum.explorewithme.mapper.CompilationMapper;
-import ru.practicum.explorewithme.model.Compilation;
-import ru.practicum.explorewithme.model.Event;
+import ru.practicum.explorewithme.model.mapper.CompilationMapper;
+import ru.practicum.explorewithme.model.dao.CompilationDao;
+import ru.practicum.explorewithme.model.dao.EventDao;
 import ru.practicum.explorewithme.repository.CompilationRepository;
 import ru.practicum.explorewithme.repository.EventRepository;
 
@@ -30,9 +30,9 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
-        Compilation compilation = compilationMapper.toCompilation(newCompilationDto);
+        CompilationDao compilation = compilationMapper.toCompilation(newCompilationDto);
 
-        Set<Event> events;
+        Set<EventDao> events;
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
             events = new HashSet<>(eventRepository.findAllById(newCompilationDto.getEvents()));
         } else {
@@ -40,7 +40,7 @@ public class CompilationServiceImpl implements CompilationService {
         }
         compilation.setEvents(events);
 
-        Compilation savedCompilation = compilationRepository.save(compilation);
+        CompilationDao savedCompilation = compilationRepository.save(compilation);
         return compilationMapper.toCompilationDto(savedCompilation);
     }
 
@@ -58,11 +58,11 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest updateRequest) {
-        Compilation compilation = compilationRepository.findById(compId)
+        CompilationDao compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation not found"));
 
         if (updateRequest.getEvents() != null) {
-            Set<Event> events = new HashSet<>(eventRepository.findAllById(updateRequest.getEvents()));
+            Set<EventDao> events = new HashSet<>(eventRepository.findAllById(updateRequest.getEvents()));
             compilation.setEvents(events);
         }
         if (updateRequest.getPinned() != null) {
@@ -72,7 +72,7 @@ public class CompilationServiceImpl implements CompilationService {
             compilation.setTitle(updateRequest.getTitle());
         }
 
-        Compilation updatedCompilation = compilationRepository.save(compilation);
+        CompilationDao updatedCompilation = compilationRepository.save(compilation);
         return compilationMapper.toCompilationDto(updatedCompilation);
     }
 
@@ -92,7 +92,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDto getCompilationById(Long compId) {
-        Compilation compilation = compilationRepository.findById(compId)
+        CompilationDao compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation not found"));
         return compilationMapper.toCompilationDto(compilation);
     }

@@ -6,7 +6,7 @@ import ru.practicum.StatResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.error_processing.exceptions.ValidationException;
-import ru.practicum.explorewithme.model.entity.Stat;
+import ru.practicum.explorewithme.model.dao.StatDao;
 import ru.practicum.explorewithme.model.mapper.StatMapper;
 import ru.practicum.explorewithme.model.repository.StatRepository;
 
@@ -24,7 +24,7 @@ public class StatServiceImpl implements StatService {
     @Override
     @Transactional
     public void addHit(EndpointHitDto endpointHitDto) {
-        Stat stat = statMapper.toStat(endpointHitDto);
+        StatDao stat = statMapper.toStat(endpointHitDto);
         statRepository.save(stat);
     }
 

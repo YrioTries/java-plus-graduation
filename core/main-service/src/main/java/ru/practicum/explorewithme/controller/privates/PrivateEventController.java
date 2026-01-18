@@ -6,10 +6,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.dto.event.EventFullDto;
-import ru.practicum.explorewithme.dto.event.EventShortDto;
-import ru.practicum.explorewithme.dto.event.NewEventDto;
-import ru.practicum.explorewithme.dto.event.UpdateEventUserRequest;
+import ru.practicum.explorewithme.model.dto.event.EventFullDto;
+import ru.practicum.explorewithme.model.dto.event.EventShortDto;
+import ru.practicum.explorewithme.model.dto.event.NewEventDto;
+import ru.practicum.explorewithme.model.dto.event.UpdateEventUserRequest;
 import ru.practicum.explorewithme.service.event.PrivateEventService;
 
 import jakarta.validation.Valid;

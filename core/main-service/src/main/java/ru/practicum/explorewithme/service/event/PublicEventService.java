@@ -1,8 +1,8 @@
 package ru.practicum.explorewithme.service.event;
 
 import jakarta.servlet.http.HttpServletRequest;
-import ru.practicum.explorewithme.dto.event.EventFullDto;
-import ru.practicum.explorewithme.dto.event.EventShortDto;
+import ru.practicum.explorewithme.model.dto.event.EventFullDto;
+import ru.practicum.explorewithme.model.dto.event.EventShortDto;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;

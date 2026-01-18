@@ -10,13 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.StatResponseDto;
 import ru.practicum.StatsClient;
-import ru.practicum.explorewithme.dto.event.EventFullDto;
-import ru.practicum.explorewithme.dto.event.EventShortDto;
-import ru.practicum.explorewithme.enums.EventState;
+import ru.practicum.explorewithme.model.dto.event.EventFullDto;
+import ru.practicum.explorewithme.model.dto.event.EventShortDto;
+import ru.practicum.explorewithme.model.enums.EventState;
 import ru.practicum.explorewithme.exception.BadRequestException;
 import ru.practicum.explorewithme.exception.NotFoundException;
-import ru.practicum.explorewithme.mapper.EventMapper;
-import ru.practicum.explorewithme.model.Event;
+import ru.practicum.explorewithme.model.mapper.EventMapper;
+import ru.practicum.explorewithme.model.dao.EventDao;
 import ru.practicum.explorewithme.repository.EventRepository;
 
 import java.time.LocalDateTime;
@@ -50,7 +50,7 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .timestamp(LocalDateTime.now())
                 .build());
 
-        Specification<Event> spec = Specification.where(null);
+        Specification<EventDao> spec = Specification.where(null);
 
         if (text != null && !text.isBlank())
             spec = spec.and(searchText(text.toLowerCase()));
@@ -68,7 +68,7 @@ public class PublicEventServiceImpl implements PublicEventService {
 
         spec = spec.and(searchPublished());
 
-        List<Event> results = eventRepository.findAll(spec, pageable).toList();
+        List<EventDao> results = eventRepository.findAll(spec, pageable).toList();
         Map<Long, Long> views = getEventsViews(results);
 
         return results
@@ -81,7 +81,7 @@ public class PublicEventServiceImpl implements PublicEventService {
     @Override
     @Transactional
     public EventFullDto getEventById(Long id, HttpServletRequest request) {
-        Event event = eventRepository.findById(id)
+        EventDao event = eventRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
 
         if (event.getState() != EventState.PUBLISHED) {
@@ -104,7 +104,7 @@ public class PublicEventServiceImpl implements PublicEventService {
         return eventDto;
     }
 
-    private Map<Long, Long> getEventsViews(List<Event> events) {
+    private Map<Long, Long> getEventsViews(List<EventDao> events) {
         List<String> uris = events
                 .stream()
                 .map(event -> String.format("/events/%s", event.getId()))
@@ -112,7 +112,7 @@ public class PublicEventServiceImpl implements PublicEventService {
 
         LocalDateTime startDate = events
                 .stream()
-                .map(Event::getPublishedOn)
+                .map(EventDao::getPublishedOn)
                 .filter(Objects::nonNull)
                 .min(LocalDateTime::compareTo)
                 .orElse(LocalDateTime.now().minusYears(1));
@@ -143,7 +143,7 @@ public class PublicEventServiceImpl implements PublicEventService {
         }
     }
 
-    private Specification<Event> searchText(String text) {
+    private Specification<EventDao> searchText(String text) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.or(
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("annotation")), "%" + text + "%"),
@@ -151,28 +151,28 @@ public class PublicEventServiceImpl implements PublicEventService {
                 );
     }
 
-    private Specification<Event> searchCategoryIn(List<Long> categories) {
+    private Specification<EventDao> searchCategoryIn(List<Long> categories) {
         return (root, query, criteriaBuilder) ->
                 root.get("category").get("id").in(categories);
     }
 
-    private Specification<Event> searchAfterDate(LocalDateTime rangeStart) {
+    private Specification<EventDao> searchAfterDate(LocalDateTime rangeStart) {
         LocalDateTime start = Objects.requireNonNullElse(rangeStart, LocalDateTime.now());
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.greaterThan(root.get("eventDate"), start);
     }
 
-    private Specification<Event> searchBeforeDate(LocalDateTime rangeEnd) {
+    private Specification<EventDao> searchBeforeDate(LocalDateTime rangeEnd) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.lessThan(root.get("eventDate"), rangeEnd);
     }
 
-    private Specification<Event> searchAvailable() {
+    private Specification<EventDao> searchAvailable() {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.greaterThanOrEqualTo(root.get("participantLimit"), 0);
     }
 
-    private Specification<Event> searchPublished() {
+    private Specification<EventDao> searchPublished() {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("state"), EventState.PUBLISHED);
     }

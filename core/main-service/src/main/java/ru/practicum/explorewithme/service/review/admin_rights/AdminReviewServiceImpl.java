@@ -6,10 +6,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.explorewithme.dto.review.ReviewDto;
+import ru.practicum.explorewithme.model.dto.review.ReviewDto;
 import ru.practicum.explorewithme.exception.NotFoundException;
-import ru.practicum.explorewithme.mapper.ReviewMapper;
-import ru.practicum.explorewithme.model.Review;
+import ru.practicum.explorewithme.model.mapper.ReviewMapper;
+import ru.practicum.explorewithme.model.dao.ReviewDao;
 import ru.practicum.explorewithme.repository.ReviewRepository;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class AdminReviewServiceImpl implements AdminReviewService {
                                              List<Long> events,
                                              Integer from,
                                              Integer size) {
-        Specification<Review> spec = Specification.where(null);
+        Specification<ReviewDao> spec = Specification.where(null);
         if (text != null && !text.isBlank()) {
             spec = spec.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("text")), "%" + text.toLowerCase() + "%"));
@@ -41,7 +41,7 @@ public class AdminReviewServiceImpl implements AdminReviewService {
                     root.get("event").get("id").in(events));
         }
         Pageable pageable = PageRequest.of(from / size, size);
-        List<Review> reviews = reviewRepository.findAll(spec, pageable).toList();
+        List<ReviewDao> reviews = reviewRepository.findAll(spec, pageable).toList();
         return reviews
                 .stream()
                 .map(reviewMapper::toReviewDto)

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.dto.category.CategoryDto;
+import ru.practicum.explorewithme.model.dto.category.CategoryDto;
 import ru.practicum.explorewithme.service.category.CategoryService;
 
 import java.util.List;

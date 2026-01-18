@@ -4,19 +4,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.explorewithme.dto.event.EventFullDto;
-import ru.practicum.explorewithme.dto.event.EventShortDto;
-import ru.practicum.explorewithme.dto.event.NewEventDto;
-import ru.practicum.explorewithme.dto.event.UpdateEventUserRequest;
-import ru.practicum.explorewithme.enums.EventState;
+import ru.practicum.explorewithme.model.dto.event.EventFullDto;
+import ru.practicum.explorewithme.model.dto.event.EventShortDto;
+import ru.practicum.explorewithme.model.dto.event.NewEventDto;
+import ru.practicum.explorewithme.model.dto.event.UpdateEventUserRequest;
+import ru.practicum.explorewithme.model.enums.EventState;
 import ru.practicum.explorewithme.exception.BadRequestException;
 import ru.practicum.explorewithme.exception.ConflictException;
 import ru.practicum.explorewithme.exception.NotFoundException;
-import ru.practicum.explorewithme.mapper.EventMapper;
-import ru.practicum.explorewithme.model.Category;
-import ru.practicum.explorewithme.model.Event;
-import ru.practicum.explorewithme.model.Location;
-import ru.practicum.explorewithme.model.User;
+import ru.practicum.explorewithme.model.mapper.EventMapper;
+import ru.practicum.explorewithme.model.dao.CategoryDao;
+import ru.practicum.explorewithme.model.dao.EventDao;
+import ru.practicum.explorewithme.model.dao.LocationDao;
+import ru.practicum.explorewithme.model.dao.UserDao;
 import ru.practicum.explorewithme.repository.CategoryRepository;
 import ru.practicum.explorewithme.repository.EventRepository;
 import ru.practicum.explorewithme.repository.UserRepository;
@@ -49,16 +49,16 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     @Override
     @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
-        User user = userRepository.findById(userId)
+        UserDao user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
-        Category category = categoryRepository.findById(newEventDto.getCategory())
+        CategoryDao category = categoryRepository.findById(newEventDto.getCategory())
                 .orElseThrow(() -> new NotFoundException("Категория не найдена"));
 
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new BadRequestException("До даты мероприятия должно быть не менее 2 часов");
         }
 
-        Event event = eventMapper.toEvent(newEventDto);
+        EventDao event = eventMapper.toEvent(newEventDto);
         event.setInitiator(user);
         event.setConfirmedRequests(0);
         event.setCategory(category);
@@ -66,12 +66,12 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         event.setState(EventState.PENDING);
 
         if (newEventDto.getLocation() != null) {
-            Location location =
+            LocationDao location =
                     eventMapper.toLocation(newEventDto.getLocation());
             event.setLocation(location);
         }
 
-        Event savedEvent = eventRepository.save(event);
+        EventDao savedEvent = eventRepository.save(event);
         EventFullDto eventFullDto = eventMapper.toEventFullDto(savedEvent);
         eventFullDto.setLocation(newEventDto.getLocation());
         return eventFullDto;
@@ -83,7 +83,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             throw new NotFoundException("User not found");
         }
 
-        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+        EventDao event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
         return eventMapper.toEventFullDto(event);
     }
@@ -96,7 +96,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             throw new NotFoundException("User not found");
         }
 
-        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+        EventDao event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
 
         if (event.getState() == EventState.PUBLISHED) {
@@ -117,16 +117,16 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         }
 
         updateEventFields(event, updateRequest);
-        Event updatedEvent = eventRepository.save(event);
+        EventDao updatedEvent = eventRepository.save(event);
         return eventMapper.toEventFullDto(updatedEvent);
     }
 
-    private void updateEventFields(Event event, UpdateEventUserRequest updateRequest) {
+    private void updateEventFields(EventDao event, UpdateEventUserRequest updateRequest) {
         if (updateRequest.getAnnotation() != null) {
             event.setAnnotation(updateRequest.getAnnotation());
         }
         if (updateRequest.getCategory() != null) {
-            Category category = categoryRepository.findById(updateRequest.getCategory())
+            CategoryDao category = categoryRepository.findById(updateRequest.getCategory())
                     .orElseThrow(() -> new NotFoundException("Category not found"));
             event.setCategory(category);
         }

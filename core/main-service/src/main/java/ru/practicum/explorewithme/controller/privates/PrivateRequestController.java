@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.dto.request.EventRequestStatusUpdateRequest;
-import ru.practicum.explorewithme.dto.request.EventRequestStatusUpdateResult;
-import ru.practicum.explorewithme.dto.request.ParticipationRequestDto;
+import ru.practicum.explorewithme.model.dto.request.EventRequestStatusUpdateRequest;
+import ru.practicum.explorewithme.model.dto.request.EventRequestStatusUpdateResult;
+import ru.practicum.explorewithme.model.dto.request.ParticipationRequestDto;
 import ru.practicum.explorewithme.service.request.RequestService;
 
 import jakarta.validation.Valid;

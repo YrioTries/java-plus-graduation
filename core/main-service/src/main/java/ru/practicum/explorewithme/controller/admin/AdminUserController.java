@@ -6,8 +6,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.dto.user.NewUserRequest;
-import ru.practicum.explorewithme.dto.user.UserDto;
+import ru.practicum.explorewithme.model.dto.user.NewUserRequest;
+import ru.practicum.explorewithme.model.dto.user.UserDto;
 import ru.practicum.explorewithme.service.user.UserService;
 
 import jakarta.validation.Valid;

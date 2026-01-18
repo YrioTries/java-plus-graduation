@@ -1,7 +1,7 @@
 package ru.practicum.explorewithme.service.category;
 
-import ru.practicum.explorewithme.dto.category.CategoryDto;
-import ru.practicum.explorewithme.dto.category.NewCategoryDto;
+import ru.practicum.explorewithme.model.dto.category.CategoryDto;
+import ru.practicum.explorewithme.model.dto.category.NewCategoryDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
