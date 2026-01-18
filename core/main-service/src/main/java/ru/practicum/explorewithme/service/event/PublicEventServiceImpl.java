@@ -49,11 +49,21 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .build());
 
         Specification<Event> spec = Specification.where(null);
-        if (text != null && !text.isBlank()) spec = spec.and(searchText(text.toLowerCase()));
-        if (categories != null && !categories.isEmpty()) spec = spec.and(searchCategoryIn(categories));
+
+        if (text != null && !text.isBlank())
+            spec = spec.and(searchText(text.toLowerCase()));
+
+        if (categories != null && !categories.isEmpty())
+            spec = spec.and(searchCategoryIn(categories));
+
         spec = spec.and(searchAfterDate(rangeStart));
-        if (rangeEnd != null) spec = spec.and(searchBeforeDate(rangeEnd));
-        if (onlyAvailable) spec = spec.and(searchAvailable());
+
+        if (rangeEnd != null)
+            spec = spec.and(searchBeforeDate(rangeEnd));
+
+        if (onlyAvailable)
+            spec = spec.and(searchAvailable());
+
         spec = spec.and(searchPublished());
 
         List<Event> results = eventRepository.findAll(spec, pageable).toList();
@@ -84,6 +94,12 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.now())
                 .build());
+
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
         EventFullDto eventDto = eventMapper.toEventFullDto(event);
 
