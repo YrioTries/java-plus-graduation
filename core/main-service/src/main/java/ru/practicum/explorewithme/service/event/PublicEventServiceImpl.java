@@ -47,6 +47,7 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.now())
                 .build());
+
         Specification<Event> spec = Specification.where(null);
         if (text != null && !text.isBlank()) spec = spec.and(searchText(text.toLowerCase()));
         if (categories != null && !categories.isEmpty()) spec = spec.and(searchCategoryIn(categories));
@@ -54,8 +55,10 @@ public class PublicEventServiceImpl implements PublicEventService {
         if (rangeEnd != null) spec = spec.and(searchBeforeDate(rangeEnd));
         if (onlyAvailable) spec = spec.and(searchAvailable());
         spec = spec.and(searchPublished());
+
         List<Event> results = eventRepository.findAll(spec, pageable).toList();
         Map<Long, Long> views = getEventsViews(results);
+
         return results
                 .stream()
                 .map(eventMapper::toEventShortDto)
@@ -85,7 +88,8 @@ public class PublicEventServiceImpl implements PublicEventService {
         EventFullDto eventDto = eventMapper.toEventFullDto(event);
 
         Map<Long, Long> views = getEventsViews(List.of(event));
-        eventDto.setViews(views.getOrDefault(id, 0L));
+        Long view = views.getOrDefault(id, 0L);
+        eventDto.setViews(view + 1);
 
         return eventDto;
     }
