@@ -3,13 +3,13 @@ package ru.practicum.explorewithme.model.mapper;
 import org.mapstruct.Mapper;
 import ru.practicum.explorewithme.model.dto.category.CategoryDto;
 import ru.practicum.explorewithme.model.dto.category.NewCategoryDto;
-import ru.practicum.explorewithme.model.dao.CategoryDao;
+import ru.practicum.explorewithme.model.dao.Category;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
-    CategoryDto toCategoryDto(CategoryDao category);
+    CategoryDto toCategoryDto(Category category);
 
-    CategoryDao toCategory(CategoryDto categoryDto);
+    Category toCategory(CategoryDto categoryDto);
 
-    CategoryDao toCategoryFromNew(NewCategoryDto newCategoryDto);
+    Category toCategoryFromNew(NewCategoryDto newCategoryDto);
 }

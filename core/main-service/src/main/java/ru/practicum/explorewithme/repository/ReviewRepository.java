@@ -3,19 +3,19 @@ package ru.practicum.explorewithme.repository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import ru.practicum.explorewithme.model.dao.ReviewDao;
+import ru.practicum.explorewithme.model.dao.Review;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface ReviewRepository extends JpaRepository<ReviewDao, Long>, JpaSpecificationExecutor<ReviewDao> {
+public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecificationExecutor<Review> {
 
-    List<ReviewDao> findAllByEventId(Long eventId, Pageable pageable);
+    List<Review> findAllByEventId(Long eventId, Pageable pageable);
 
-    Optional<ReviewDao> findByIdAndAuthorId(Long id, Long authorId);
+    Optional<Review> findByIdAndAuthorId(Long id, Long authorId);
 
-    List<ReviewDao> findAllByAuthorId(Long authorId);
+    List<Review> findAllByAuthorId(Long authorId);
 
-    Optional<ReviewDao> findByEventIdAndAuthorId(Long eventId, Long authorId);
+    Optional<Review> findByEventIdAndAuthorId(Long eventId, Long authorId);
 
 }

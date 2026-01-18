@@ -7,29 +7,29 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.explorewithme.model.enums.EventState;
-import ru.practicum.explorewithme.model.dao.EventDao;
+import ru.practicum.explorewithme.model.dao.Event;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface EventRepository extends JpaRepository<EventDao, Long>, JpaSpecificationExecutor<EventDao> {
-    Page<EventDao> findByInitiatorId(Long userId, Pageable pageable);
+public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
+    Page<Event> findByInitiatorId(Long userId, Pageable pageable);
 
-    Optional<EventDao> findByIdAndInitiatorId(Long eventId, Long userId);
+    Optional<Event> findByIdAndInitiatorId(Long eventId, Long userId);
 
-    List<EventDao> findByCategoryId(Long categoryId);
+    List<Event> findByCategoryId(Long categoryId);
 
     @Query("SELECT e FROM Event e WHERE " +
             "(:users IS NULL OR e.initiator.id IN :users) AND " +
             "(:states IS NULL OR e.state IN :states) AND " +
             "(:categories IS NULL OR e.category.id IN :categories) AND " +
             "(e.eventDate BETWEEN :rangeStart AND :rangeEnd)")
-    Page<EventDao> findEventsByAdmin(@Param("users") List<Long> users,
-                                     @Param("states") List<EventState> states,
-                                     @Param("categories") List<Long> categories,
-                                     @Param("rangeStart") LocalDateTime rangeStart,
-                                     @Param("rangeEnd") LocalDateTime rangeEnd,
-                                     Pageable pageable);
+    Page<Event> findEventsByAdmin(@Param("users") List<Long> users,
+                                  @Param("states") List<EventState> states,
+                                  @Param("categories") List<Long> categories,
+                                  @Param("rangeStart") LocalDateTime rangeStart,
+                                  @Param("rangeEnd") LocalDateTime rangeEnd,
+                                  Pageable pageable);
 
 }

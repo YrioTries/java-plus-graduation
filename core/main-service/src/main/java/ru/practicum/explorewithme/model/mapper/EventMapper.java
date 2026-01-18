@@ -5,8 +5,8 @@ import ru.practicum.explorewithme.model.dto.LocationDto;
 import ru.practicum.explorewithme.model.dto.event.EventFullDto;
 import ru.practicum.explorewithme.model.dto.event.EventShortDto;
 import ru.practicum.explorewithme.model.dto.event.NewEventDto;
-import ru.practicum.explorewithme.model.dao.EventDao;
-import ru.practicum.explorewithme.model.dao.LocationDao;
+import ru.practicum.explorewithme.model.dao.Event;
+import ru.practicum.explorewithme.model.dao.Location;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
@@ -19,28 +19,28 @@ public interface EventMapper {
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "state", ignore = true)
     @Mapping(target = "views", ignore = true)
-    EventDao toEvent(NewEventDto newEventDto);
+    Event toEvent(NewEventDto newEventDto);
 
     @Mapping(target = "category")
     @Mapping(target = "initiator")
-    EventFullDto toEventFullDto(EventDao event);
+    EventFullDto toEventFullDto(Event event);
 
     @Mapping(target = "category")
     @Mapping(target = "initiator")
-    EventShortDto toEventShortDto(EventDao event);
+    EventShortDto toEventShortDto(Event event);
 
-    default LocationDao toLocation(LocationDto dto) {
+    default Location toLocation(LocationDto dto) {
         if (dto == null) {
             return null;
         }
-        LocationDao location = new LocationDao();
+        Location location = new Location();
         location.setLat(dto.getLat());
         location.setLon(dto.getLon());
         return location;
     }
 
     @AfterMapping
-    default void setDefaultValues(@MappingTarget EventDao event, NewEventDto newEventDto) {
+    default void setDefaultValues(@MappingTarget Event event, NewEventDto newEventDto) {
         if (newEventDto.getPaid() == null) {
             event.setPaid(false);
         }
@@ -52,7 +52,7 @@ public interface EventMapper {
         }
     }
 
-    default EventFullDto toEventFullDtoWithDetails(EventDao event, CategoryMapper categoryMapper, UserMapper userMapper) {
+    default EventFullDto toEventFullDtoWithDetails(Event event, CategoryMapper categoryMapper, UserMapper userMapper) {
         EventFullDto dto = toEventFullDto(event);
         if (event.getCategory() != null) {
             dto.setCategory(categoryMapper.toCategoryDto(event.getCategory()));
@@ -63,7 +63,7 @@ public interface EventMapper {
         return dto;
     }
 
-    default EventShortDto toEventShortDtoWithDetails(EventDao event, CategoryMapper categoryMapper, UserMapper userMapper) {
+    default EventShortDto toEventShortDtoWithDetails(Event event, CategoryMapper categoryMapper, UserMapper userMapper) {
         EventShortDto dto = toEventShortDto(event);
         if (event.getCategory() != null) {
             dto.setCategory(categoryMapper.toCategoryDto(event.getCategory()));

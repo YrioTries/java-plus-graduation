@@ -11,9 +11,9 @@ import ru.practicum.explorewithme.model.enums.RequestStatus;
 import ru.practicum.explorewithme.exception.ConflictException;
 import ru.practicum.explorewithme.exception.NotFoundException;
 import ru.practicum.explorewithme.model.mapper.ParticipationRequestMapper;
-import ru.practicum.explorewithme.model.dao.EventDao;
-import ru.practicum.explorewithme.model.dao.ParticipationRequestDao;
-import ru.practicum.explorewithme.model.dao.UserDao;
+import ru.practicum.explorewithme.model.dao.Event;
+import ru.practicum.explorewithme.model.dao.ParticipationRequest;
+import ru.practicum.explorewithme.model.dao.User;
 import ru.practicum.explorewithme.repository.EventRepository;
 import ru.practicum.explorewithme.repository.ParticipationRequestRepository;
 import ru.practicum.explorewithme.repository.UserRepository;
@@ -36,7 +36,7 @@ public class ParticipationRequestServiceImpl implements RequestService {
 
     @Override
     public List<ParticipationRequestDto> getEventRequests(Long userId, Long eventId) {
-        EventDao event = eventRepository.findById(eventId)
+        Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " not found"));
 
         if (!event.getInitiator().getId().equals(userId)) {
@@ -53,7 +53,7 @@ public class ParticipationRequestServiceImpl implements RequestService {
     @Transactional
     public EventRequestStatusUpdateResult updateRequestStatus(Long userId, Long eventId,
                                                               EventRequestStatusUpdateRequest updateRequest) {
-        EventDao event = eventRepository.findById(eventId)
+        Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " not found"));
 
         if (!event.getInitiator().getId().equals(userId)) {
@@ -69,9 +69,9 @@ public class ParticipationRequestServiceImpl implements RequestService {
             return new EventRequestStatusUpdateResult(List.of(), List.of());
         }
 
-        Map<Long, ParticipationRequestDao> requestsMap = participationRequestRepository.findByIdIn(requestIds)
+        Map<Long, ParticipationRequest> requestsMap = participationRequestRepository.findByIdIn(requestIds)
                 .stream()
-                .collect(Collectors.toMap(ParticipationRequestDao::getId, Function.identity()));
+                .collect(Collectors.toMap(ParticipationRequest::getId, Function.identity()));
 
         validateAllRequestsFound(requestIds, requestsMap);
 
@@ -90,7 +90,7 @@ public class ParticipationRequestServiceImpl implements RequestService {
         return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
     }
 
-    private void validateAllRequestsFound(List<Long> requestIds, Map<Long, ParticipationRequestDao> requestsMap) {
+    private void validateAllRequestsFound(List<Long> requestIds, Map<Long, ParticipationRequest> requestsMap) {
         if (requestsMap.size() != requestIds.size()) {
             List<Long> foundIds = new ArrayList<>(requestsMap.keySet());
             List<Long> missingIds = requestIds.stream()
@@ -100,10 +100,10 @@ public class ParticipationRequestServiceImpl implements RequestService {
         }
     }
 
-    private void validateRequestsMap(Map<Long, ParticipationRequestDao> requestsMap, Long eventId) {
+    private void validateRequestsMap(Map<Long, ParticipationRequest> requestsMap, Long eventId) {
         List<String> errors = new ArrayList<>();
 
-        for (ParticipationRequestDao request : requestsMap.values()) {
+        for (ParticipationRequest request : requestsMap.values()) {
             if (!request.getEvent().getId().equals(eventId)) {
                 errors.add("Request with id=" + request.getId() + " does not belong to event with id=" + eventId);
             }
@@ -117,19 +117,19 @@ public class ParticipationRequestServiceImpl implements RequestService {
         }
     }
 
-    private void processConfirmationWithMap(EventDao event, Map<Long, ParticipationRequestDao> requestsMap,
+    private void processConfirmationWithMap(Event event, Map<Long, ParticipationRequest> requestsMap,
                                             List<Long> requestIds, List<ParticipationRequestDto> confirmedRequests,
                                             List<ParticipationRequestDto> rejectedRequests) {
         Long confirmedCount = participationRequestRepository.countConfirmedRequestsByEventId(event.getId());
         int participantLimit = event.getParticipantLimit();
         int availableSlots = participantLimit - confirmedCount.intValue();
 
-        List<ParticipationRequestDao> requestsToUpdate = new ArrayList<>();
-        List<ParticipationRequestDao> requestsToReject = new ArrayList<>();
+        List<ParticipationRequest> requestsToUpdate = new ArrayList<>();
+        List<ParticipationRequest> requestsToReject = new ArrayList<>();
 
         for (int i = 0; i < requestIds.size(); i++) {
             Long requestId = requestIds.get(i);
-            ParticipationRequestDao request = requestsMap.get(requestId);
+            ParticipationRequest request = requestsMap.get(requestId);
 
             if (i < availableSlots) {
                 request.setStatus(RequestStatus.CONFIRMED);
@@ -147,33 +147,33 @@ public class ParticipationRequestServiceImpl implements RequestService {
         }
     }
 
-    private void processRejectionWithMap(Map<Long, ParticipationRequestDao> requestsMap,
+    private void processRejectionWithMap(Map<Long, ParticipationRequest> requestsMap,
                                          List<Long> requestIds, List<ParticipationRequestDto> rejectedRequests) {
-        List<ParticipationRequestDao> requestsToReject = requestIds.stream()
+        List<ParticipationRequest> requestsToReject = requestIds.stream()
                 .map(requestsMap::get)
                 .collect(Collectors.toList());
 
         requestsToReject.forEach(request -> request.setStatus(RequestStatus.REJECTED));
-        List<ParticipationRequestDao> savedRequests = participationRequestRepository.saveAll(requestsToReject);
+        List<ParticipationRequest> savedRequests = participationRequestRepository.saveAll(requestsToReject);
 
         rejectedRequests.addAll(savedRequests.stream()
                 .map(participationRequestMapper::toParticipationRequestDto)
                 .collect(Collectors.toList()));
     }
 
-    private void saveAndMapResults(List<ParticipationRequestDao> requestsToUpdate,
-                                   List<ParticipationRequestDao> requestsToReject,
+    private void saveAndMapResults(List<ParticipationRequest> requestsToUpdate,
+                                   List<ParticipationRequest> requestsToReject,
                                    List<ParticipationRequestDto> confirmedRequests,
                                    List<ParticipationRequestDto> rejectedRequests) {
         if (!requestsToUpdate.isEmpty()) {
-            List<ParticipationRequestDao> savedConfirmed = participationRequestRepository.saveAll(requestsToUpdate);
+            List<ParticipationRequest> savedConfirmed = participationRequestRepository.saveAll(requestsToUpdate);
             confirmedRequests.addAll(savedConfirmed.stream()
                     .map(participationRequestMapper::toParticipationRequestDto)
                     .collect(Collectors.toList()));
         }
 
         if (!requestsToReject.isEmpty()) {
-            List<ParticipationRequestDao> savedRejected = participationRequestRepository.saveAll(requestsToReject);
+            List<ParticipationRequest> savedRejected = participationRequestRepository.saveAll(requestsToReject);
             rejectedRequests.addAll(savedRejected.stream()
                     .map(participationRequestMapper::toParticipationRequestDto)
                     .collect(Collectors.toList()));
@@ -181,15 +181,15 @@ public class ParticipationRequestServiceImpl implements RequestService {
     }
 
     private void rejectAllPendingRequests(Long eventId, List<ParticipationRequestDto> rejectedRequests) {
-        List<ParticipationRequestDao> pendingRequests = participationRequestRepository
+        List<ParticipationRequest> pendingRequests = participationRequestRepository
                 .findByEventIdAndStatus(eventId, RequestStatus.PENDING);
 
         if (!pendingRequests.isEmpty()) {
-            Map<Long, ParticipationRequestDao> pendingMap = pendingRequests.stream()
-                    .collect(Collectors.toMap(ParticipationRequestDao::getId, Function.identity()));
+            Map<Long, ParticipationRequest> pendingMap = pendingRequests.stream()
+                    .collect(Collectors.toMap(ParticipationRequest::getId, Function.identity()));
 
             pendingMap.values().forEach(request -> request.setStatus(RequestStatus.REJECTED));
-            List<ParticipationRequestDao> savedRequests = participationRequestRepository.saveAll(pendingMap.values());
+            List<ParticipationRequest> savedRequests = participationRequestRepository.saveAll(pendingMap.values());
 
             rejectedRequests.addAll(savedRequests.stream()
                     .map(participationRequestMapper::toParticipationRequestDto)
@@ -213,9 +213,9 @@ public class ParticipationRequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public ParticipationRequestDto createRequest(Long userId, Long eventId) {
-        UserDao user = userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
-        EventDao event = eventRepository.findById(eventId)
+        Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " not found"));
 
         participationRequestRepository.findByEventAndRequester(event, user)
@@ -239,7 +239,7 @@ public class ParticipationRequestServiceImpl implements RequestService {
             }
         }
 
-        ParticipationRequestDao request = new ParticipationRequestDao();
+        ParticipationRequest request = new ParticipationRequest();
         request.setCreated(LocalDateTime.now());
         request.setEvent(event);
         request.setRequester(user);
@@ -250,7 +250,7 @@ public class ParticipationRequestServiceImpl implements RequestService {
             request.setStatus(RequestStatus.PENDING);
         }
 
-        ParticipationRequestDao savedRequest = participationRequestRepository.save(request);
+        ParticipationRequest savedRequest = participationRequestRepository.save(request);
         return participationRequestMapper.toParticipationRequestDto(savedRequest);
     }
 
@@ -258,10 +258,10 @@ public class ParticipationRequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
-        UserDao user = userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
 
-        ParticipationRequestDao request = participationRequestRepository.findById(requestId)
+        ParticipationRequest request = participationRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Request with id=" + requestId + " not found"));
 
         if (!request.getRequester().getId().equals(userId)) {
@@ -270,7 +270,7 @@ public class ParticipationRequestServiceImpl implements RequestService {
         }
 
         request.setStatus(RequestStatus.CANCELED);
-        ParticipationRequestDao savedRequest = participationRequestRepository.save(request);
+        ParticipationRequest savedRequest = participationRequestRepository.save(request);
         return participationRequestMapper.toParticipationRequestDto(savedRequest);
     }
 }

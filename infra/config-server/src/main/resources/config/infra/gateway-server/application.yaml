@@ -102,3 +102,5 @@ spring:
             - Path=/reviews/**
           filters:
             - RewritePath=/reviews/(?<segment>.*), /reviews/$\{segment}
+
+

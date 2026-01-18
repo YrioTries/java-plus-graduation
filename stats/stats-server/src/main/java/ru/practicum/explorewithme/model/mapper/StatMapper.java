@@ -4,14 +4,14 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.StatResponseDto;
-import ru.practicum.explorewithme.model.dao.StatDao;
+import ru.practicum.explorewithme.model.dao.Stat;
 
 @Mapper(componentModel = "spring")
 public interface StatMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "timestamp", target = "created")
-    StatDao toStat(EndpointHitDto endpointHitDto);
+    Stat toStat(EndpointHitDto endpointHitDto);
 
-    StatResponseDto toStatResponseDto(StatDao stat);
+    StatResponseDto toStatResponseDto(Stat stat);
 }

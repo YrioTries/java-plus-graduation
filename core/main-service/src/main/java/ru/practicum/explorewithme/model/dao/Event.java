@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventDao {
+public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public class EventDao {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    CategoryDao category;
+    Category category;
 
     @Transient
     private Long views;
@@ -47,10 +47,10 @@ public class EventDao {
 
     @ManyToOne
     @JoinColumn(name = "initiator_id")
-    UserDao initiator;
+    User initiator;
 
     @Embedded
-    LocationDao location;
+    Location location;
     Boolean paid;
 
     @Column(name = "participant_limit")

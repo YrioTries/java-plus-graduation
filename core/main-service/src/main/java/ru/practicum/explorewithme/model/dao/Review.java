@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewDao {
+public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
@@ -36,11 +36,11 @@ public class ReviewDao {
 
     @ManyToOne
     @JoinColumn(name = "event_id", nullable = false)
-    private EventDao event;
+    private Event event;
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
-    private UserDao author;
+    private User author;
 
     @Column(name = "created_on", nullable = false)
     @CreationTimestamp

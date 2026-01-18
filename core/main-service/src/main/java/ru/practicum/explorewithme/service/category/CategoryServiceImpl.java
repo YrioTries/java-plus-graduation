@@ -9,7 +9,7 @@ import ru.practicum.explorewithme.model.dto.category.NewCategoryDto;
 import ru.practicum.explorewithme.exception.ConflictException;
 import ru.practicum.explorewithme.exception.NotFoundException;
 import ru.practicum.explorewithme.model.mapper.CategoryMapper;
-import ru.practicum.explorewithme.model.dao.CategoryDao;
+import ru.practicum.explorewithme.model.dao.Category;
 import ru.practicum.explorewithme.repository.CategoryRepository;
 import ru.practicum.explorewithme.repository.EventRepository;
 
@@ -30,15 +30,15 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ConflictException("Category name must be unique");
         }
 
-        CategoryDao category = categoryMapper.toCategoryFromNew(newCategoryDto);
-        CategoryDao savedCategory = categoryRepository.save(category);
+        Category category = categoryMapper.toCategoryFromNew(newCategoryDto);
+        Category savedCategory = categoryRepository.save(category);
         return categoryMapper.toCategoryDto(savedCategory);
     }
 
     @Override
     @Transactional
     public void deleteCategory(Long catId) {
-        CategoryDao category = categoryRepository.findById(catId)
+        Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
 
         if (!eventRepository.findByCategoryId(catId).isEmpty()) {
@@ -51,7 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
-        CategoryDao category = categoryRepository.findById(catId)
+        Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
 
         if (!category.getName().equals(categoryDto.getName()) &&
@@ -60,7 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         category.setName(categoryDto.getName());
-        CategoryDao updatedCategory = categoryRepository.save(category);
+        Category updatedCategory = categoryRepository.save(category);
         return categoryMapper.toCategoryDto(updatedCategory);
     }
 
@@ -73,7 +73,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getCategoryById(Long catId) {
-        CategoryDao category = categoryRepository.findById(catId)
+        Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
         return categoryMapper.toCategoryDto(category);
     }

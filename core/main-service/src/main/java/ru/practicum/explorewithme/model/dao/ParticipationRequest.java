@@ -16,7 +16,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ParticipationRequestDao {
+public class ParticipationRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "request_id")
@@ -25,10 +25,10 @@ public class ParticipationRequestDao {
     LocalDateTime created = LocalDateTime.now();
     @ManyToOne
     @JoinColumn(name = "event_id")
-    EventDao event;
+    Event event;
     @ManyToOne
     @JoinColumn(name = "requester_id")
-    UserDao requester;
+    User requester;
     @Enumerated(value = EnumType.STRING)
     RequestStatus status;
 

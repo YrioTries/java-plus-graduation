@@ -4,13 +4,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.explorewithme.model.dto.compilation.CompilationDto;
 import ru.practicum.explorewithme.model.dto.compilation.NewCompilationDto;
-import ru.practicum.explorewithme.model.dao.CompilationDao;
+import ru.practicum.explorewithme.model.dao.Compilation;
 
 @Mapper(componentModel = "spring", uses = {EventMapper.class})
 public interface CompilationMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "events", ignore = true)
-    CompilationDao toCompilation(NewCompilationDto newCompilationDto);
+    Compilation toCompilation(NewCompilationDto newCompilationDto);
 
-    CompilationDto toCompilationDto(CompilationDao compilation);
+    CompilationDto toCompilationDto(Compilation compilation);
 }

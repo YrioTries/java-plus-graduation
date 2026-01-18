@@ -13,10 +13,10 @@ import ru.practicum.explorewithme.exception.BadRequestException;
 import ru.practicum.explorewithme.exception.ConflictException;
 import ru.practicum.explorewithme.exception.NotFoundException;
 import ru.practicum.explorewithme.model.mapper.EventMapper;
-import ru.practicum.explorewithme.model.dao.CategoryDao;
-import ru.practicum.explorewithme.model.dao.EventDao;
-import ru.practicum.explorewithme.model.dao.LocationDao;
-import ru.practicum.explorewithme.model.dao.UserDao;
+import ru.practicum.explorewithme.model.dao.Category;
+import ru.practicum.explorewithme.model.dao.Event;
+import ru.practicum.explorewithme.model.dao.Location;
+import ru.practicum.explorewithme.model.dao.User;
 import ru.practicum.explorewithme.repository.CategoryRepository;
 import ru.practicum.explorewithme.repository.EventRepository;
 import ru.practicum.explorewithme.repository.UserRepository;
@@ -49,16 +49,16 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     @Override
     @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
-        UserDao user = userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
-        CategoryDao category = categoryRepository.findById(newEventDto.getCategory())
+        Category category = categoryRepository.findById(newEventDto.getCategory())
                 .orElseThrow(() -> new NotFoundException("Категория не найдена"));
 
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new BadRequestException("До даты мероприятия должно быть не менее 2 часов");
         }
 
-        EventDao event = eventMapper.toEvent(newEventDto);
+        Event event = eventMapper.toEvent(newEventDto);
         event.setInitiator(user);
         event.setConfirmedRequests(0);
         event.setCategory(category);
@@ -66,12 +66,12 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         event.setState(EventState.PENDING);
 
         if (newEventDto.getLocation() != null) {
-            LocationDao location =
+            Location location =
                     eventMapper.toLocation(newEventDto.getLocation());
             event.setLocation(location);
         }
 
-        EventDao savedEvent = eventRepository.save(event);
+        Event savedEvent = eventRepository.save(event);
         EventFullDto eventFullDto = eventMapper.toEventFullDto(savedEvent);
         eventFullDto.setLocation(newEventDto.getLocation());
         return eventFullDto;
@@ -83,7 +83,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             throw new NotFoundException("User not found");
         }
 
-        EventDao event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
         return eventMapper.toEventFullDto(event);
     }
@@ -96,7 +96,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             throw new NotFoundException("User not found");
         }
 
-        EventDao event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
 
         if (event.getState() == EventState.PUBLISHED) {
@@ -117,16 +117,16 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         }
 
         updateEventFields(event, updateRequest);
-        EventDao updatedEvent = eventRepository.save(event);
+        Event updatedEvent = eventRepository.save(event);
         return eventMapper.toEventFullDto(updatedEvent);
     }
 
-    private void updateEventFields(EventDao event, UpdateEventUserRequest updateRequest) {
+    private void updateEventFields(Event event, UpdateEventUserRequest updateRequest) {
         if (updateRequest.getAnnotation() != null) {
             event.setAnnotation(updateRequest.getAnnotation());
         }
         if (updateRequest.getCategory() != null) {
-            CategoryDao category = categoryRepository.findById(updateRequest.getCategory())
+            Category category = categoryRepository.findById(updateRequest.getCategory())
                     .orElseThrow(() -> new NotFoundException("Category not found"));
             event.setCategory(category);
         }

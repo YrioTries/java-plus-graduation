@@ -4,12 +4,12 @@ import ru.practicum.StatResponseDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.practicum.explorewithme.model.dao.StatDao;
+import ru.practicum.explorewithme.model.dao.Stat;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface StatRepository extends JpaRepository<StatDao, Long> {
+public interface StatRepository extends JpaRepository<Stat, Long> {
 
     @Query("SELECT new ru.practicum.StatResponseDto(s.app, s.uri, COUNT(s)) " +
             "FROM Stat s " +

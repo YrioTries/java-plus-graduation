@@ -5,31 +5,31 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.explorewithme.model.enums.RequestStatus;
-import ru.practicum.explorewithme.model.dao.EventDao;
-import ru.practicum.explorewithme.model.dao.ParticipationRequestDao;
-import ru.practicum.explorewithme.model.dao.UserDao;
+import ru.practicum.explorewithme.model.dao.Event;
+import ru.practicum.explorewithme.model.dao.ParticipationRequest;
+import ru.practicum.explorewithme.model.dao.User;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface ParticipationRequestRepository extends JpaRepository<ParticipationRequestDao, Long> {
+public interface ParticipationRequestRepository extends JpaRepository<ParticipationRequest, Long> {
 
-    List<ParticipationRequestDao> findByRequesterId(Long requesterId);
+    List<ParticipationRequest> findByRequesterId(Long requesterId);
 
-    List<ParticipationRequestDao> findByEventId(Long eventId);
+    List<ParticipationRequest> findByEventId(Long eventId);
 
-    Optional<ParticipationRequestDao> findByEventIdAndRequesterId(Long eventId, Long requesterId);
+    Optional<ParticipationRequest> findByEventIdAndRequesterId(Long eventId, Long requesterId);
 
-    Optional<ParticipationRequestDao> findByEventAndRequester(EventDao event, UserDao requester);
+    Optional<ParticipationRequest> findByEventAndRequester(Event event, User requester);
 
-    List<ParticipationRequestDao> findByIdIn(List<Long> requestIds);
+    List<ParticipationRequest> findByIdIn(List<Long> requestIds);
 
     @Query("SELECT COUNT(pr) FROM ParticipationRequest pr WHERE pr.event.id = :eventId AND pr.status = 'CONFIRMED'")
     Long countConfirmedRequestsByEventId(@Param("eventId") Long eventId);
 
-    List<ParticipationRequestDao> findByEventIdAndStatus(Long eventId, RequestStatus status);
+    List<ParticipationRequest> findByEventIdAndStatus(Long eventId, RequestStatus status);
 
-    List<ParticipationRequestDao> findAllByEventIdInAndStatus(List<Long> eventIds, RequestStatus status);
+    List<ParticipationRequest> findAllByEventIdInAndStatus(List<Long> eventIds, RequestStatus status);
 
     @Modifying
     @Query("UPDATE ParticipationRequest pr SET pr.status = :status WHERE pr.id IN :requestIds")

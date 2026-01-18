@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder(toBuilder = true)
-public class UserDao {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

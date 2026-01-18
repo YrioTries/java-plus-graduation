@@ -89,7 +89,22 @@ services:
       SPRING_DATASOURCE_USERNAME: dbuser
       SPRING_DATASOURCE_PASSWORD: 12345
       SPRING_PROFILES_ACTIVE: docker
-      STATS_SERVER_URL: http://stats-server:9090
+    restart: unless-stopped
+
+  gateway-server:
+    build:
+      context: ./gateway-server
+      dockerfile: Dockerfile
+    container_name: gateway-server
+    ports:
+      - "8080:8080"
+    depends_on:
+      discovery-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
     restart: unless-stopped
 
 volumes:

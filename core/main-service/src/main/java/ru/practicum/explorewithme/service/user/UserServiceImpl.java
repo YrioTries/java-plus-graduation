@@ -9,7 +9,7 @@ import ru.practicum.explorewithme.model.dto.user.UserDto;
 import ru.practicum.explorewithme.exception.ConflictException;
 import ru.practicum.explorewithme.exception.NotFoundException;
 import ru.practicum.explorewithme.model.mapper.UserMapper;
-import ru.practicum.explorewithme.model.dao.UserDao;
+import ru.practicum.explorewithme.model.dao.User;
 import ru.practicum.explorewithme.repository.UserRepository;
 
 import java.util.List;
@@ -41,8 +41,8 @@ public class UserServiceImpl implements UserService {
             throw new ConflictException("Email must be unique");
         }
 
-        UserDao user = userMapper.toUser(newUserRequest);
-        UserDao savedUser = userRepository.save(user);
+        User user = userMapper.toUser(newUserRequest);
+        User savedUser = userRepository.save(user);
         return userMapper.toUserDto(savedUser);
     }
 

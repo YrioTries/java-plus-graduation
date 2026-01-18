@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.model.dto.review.ReviewDto;
 import ru.practicum.explorewithme.exception.NotFoundException;
 import ru.practicum.explorewithme.model.mapper.ReviewMapper;
-import ru.practicum.explorewithme.model.dao.ReviewDao;
+import ru.practicum.explorewithme.model.dao.Review;
 import ru.practicum.explorewithme.repository.EventRepository;
 import ru.practicum.explorewithme.repository.ReviewRepository;
 
@@ -28,7 +28,7 @@ public class PublicReviewServiceImpl implements PublicReviewService {
             throw new NotFoundException("Ивента с id=" + eventId + " нет в БД!");
         }
         PageRequest pageRequest = PageRequest.of(from / size, size);
-        List<ReviewDao> reviews = reviewRepository.findAllByEventId(eventId, pageRequest);
+        List<Review> reviews = reviewRepository.findAllByEventId(eventId, pageRequest);
         return reviews
                 .stream()
                 .map(reviewMapper::toReviewDto)

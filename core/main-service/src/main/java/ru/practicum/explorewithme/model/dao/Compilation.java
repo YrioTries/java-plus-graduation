@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
-public class CompilationDao {
+public class Compilation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "compilation_id")
@@ -28,5 +28,5 @@ public class CompilationDao {
     @ManyToMany
     @JoinTable(joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))
-    Set<EventDao> events;
+    Set<Event> events;
 }
