@@ -19,7 +19,7 @@ public class StatsClient {
     private final String serverUrl;
     private final RestClient restClient;
 
-    public StatsClient(@Value("${stats-server.url:http://stats-server}") String serverUrl, RestClient restClient) {
+    public StatsClient(@Value("${stats-server.url}") String serverUrl, RestClient restClient) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout((int) Duration.ofSeconds(5).toMillis());
         requestFactory.setReadTimeout((int) Duration.ofSeconds(5).toMillis());
