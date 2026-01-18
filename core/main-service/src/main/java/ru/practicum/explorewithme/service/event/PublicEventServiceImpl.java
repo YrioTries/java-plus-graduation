@@ -115,26 +115,20 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .map(event -> String.format("/events/%s", event.getId()))
                 .toList();
 
-        LocalDateTime startDate = events
-                .stream()
-                .map(Event::getCreatedOn)
-                .min(LocalDateTime::compareTo)
-                .orElse(null);
+        LocalDateTime startDate = LocalDateTime.now().minusDays(365);
+        LocalDateTime endDate = LocalDateTime.now();
 
         Map<Long, Long> viewStats = new HashMap<>();
-        if (startDate != null) {
-            LocalDateTime endDate = LocalDateTime.now();
-            if (startDate.isAfter(endDate)) {
-                throw new BadRequestException("Start date is after end date");
-            }
-            List<StatResponseDto> stats = statsClient.getStats(startDate, endDate,
-                    uris, true);
-            viewStats = stats
-                    .stream()
-                    .filter(s -> s.getUri().startsWith("/events/"))
-                    .collect(Collectors.toMap(s -> Long.parseLong(s.getUri().substring("/events/".length())),
-                            StatResponseDto::getHits));
-        }
+
+        List<StatResponseDto> stats = statsClient.getStats(startDate, endDate, uris, true);
+        viewStats = stats
+                .stream()
+                .filter(s -> s.getUri().startsWith("/events/"))
+                .collect(Collectors.toMap(
+                        s -> Long.parseLong(s.getUri().substring("/events/".length())),
+                        StatResponseDto::getHits
+                ));
+
         return viewStats;
     }
 
