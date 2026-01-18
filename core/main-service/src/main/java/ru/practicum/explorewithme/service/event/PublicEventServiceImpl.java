@@ -132,7 +132,6 @@ public class PublicEventServiceImpl implements PublicEventService {
         } catch (Exception e) {
             log.error("Error getting stats: {}", e.getMessage());
         }
-
         return viewStats;
     }
 
