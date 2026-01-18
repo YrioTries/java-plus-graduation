@@ -69,6 +69,7 @@ public class PublicEventServiceImpl implements PublicEventService {
     public EventFullDto getEventById(Long id, HttpServletRequest request) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
+
         if (event.getState() != EventState.PUBLISHED) {
             throw new NotFoundException("Event not found");
         }
@@ -80,9 +81,12 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.now())
                 .build());
+
         EventFullDto eventDto = eventMapper.toEventFullDto(event);
+
         Map<Long, Long> views = getEventsViews(List.of(event));
-        eventDto.setViews(views.getOrDefault(id, 0L));
+        eventDto.setViews(views.getOrDefault(id, 0L) + 1);
+
         return eventDto;
     }
 
@@ -91,11 +95,13 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .stream()
                 .map(event -> String.format("/events/%s", event.getId()))
                 .toList();
+
         LocalDateTime startDate = events
                 .stream()
                 .map(Event::getCreatedOn)
                 .min(LocalDateTime::compareTo)
                 .orElse(null);
+
         Map<Long, Long> viewStats = new HashMap<>();
         if (startDate != null) {
             LocalDateTime endDate = LocalDateTime.now();
