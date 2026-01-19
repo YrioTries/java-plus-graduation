@@ -9,7 +9,6 @@
     </parent>
 
     <name>infra</name>
-
     <artifactId>infra</artifactId>
     <packaging>pom</packaging>
 
@@ -18,21 +17,5 @@
         <module>discovery-server</module>
         <module>gateway-server</module>
     </modules>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-netflix-eureka-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-config-server</artifactId>
-        </dependency>
-    </dependencies>
 
 </project>

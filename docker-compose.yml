@@ -1,14 +1,112 @@
+version: '3.8'
+
 services:
-  stats-server:
+  discovery-server:
+    build: discovery-server
+    container_name: discovery-server
     ports:
-      - "9090:9090"
+      - "8761:8761"
+    restart: unless-stopped
+
+  config-server:
+    build: config-server
+    container_name: config-server
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - discovery-server
+    restart: unless-stopped
 
   stats-db:
     image: postgres:16.1
+    container_name: stats-db
+    environment:
+      POSTGRES_DB: explorewithme
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5432:5432"
+    volumes:
+      - stats-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser -d explorewithme"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  ewm-service:
+  stats-server:
+    build:
+      context: stats/server
+      dockerfile: Dockerfile
+    container_name: stats-server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/explorewithme
+      SPRING_DATASOURCE_USERNAME: dbuser
+      SPRING_DATASOURCE_PASSWORD: 12345
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      stats-db:
+        condition: service_healthy
+      discovery-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+    restart: unless-stopped
+
+  main-service-db:
+    image: postgres:16.1
+    container_name: main-service-db
+    environment:
+      POSTGRES_DB: main
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5433:5432"
+    volumes:
+      - main-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser -d main"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  main-service:
+    build:
+      context: ./core/main-service
+      dockerfile: Dockerfile
+    container_name: main-service
+    depends_on:
+      main-service-db:
+        condition: service_healthy
+      stats-server:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://main-service-db:5432/main
+      SPRING_DATASOURCE_USERNAME: dbuser
+      SPRING_DATASOURCE_PASSWORD: 12345
+      SPRING_PROFILES_ACTIVE: docker
+    restart: unless-stopped
+
+  gateway-server:
+    build:
+      context: ./gateway-server
+      dockerfile: Dockerfile
+    container_name: gateway-server
     ports:
       - "8080:8080"
+    depends_on:
+      discovery-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    restart: unless-stopped
 
-  ewm-db:
-    image: postgres:16.1
+volumes:
+  stats-db-data:
+  main-db-data:
