@@ -1,4 +1,4 @@
-package ru.practicum.explore_with_me.compilation.collector.public_rights;
+package ru.practicum.explore_with_me.compilation.controller.public_rights;
 
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;

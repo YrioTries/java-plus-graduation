@@ -1,4 +1,4 @@
-package ru.practicum.explore_with_me.compilation.collector.admin_rights;
+package ru.practicum.explore_with_me.compilation.controller.admin_rights;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;

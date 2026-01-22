@@ -16,7 +16,7 @@ import ru.practicum.explore_with_me.event.repository.EventRepository;
 import ru.practicum.explore_with_me.interaction_api.exception.NotFoundException;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventFullDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDto;
-import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventState;
+import ru.practicum.explore_with_me.interaction_api.model.event.EventState;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

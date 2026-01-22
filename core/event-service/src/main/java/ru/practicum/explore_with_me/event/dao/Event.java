@@ -2,7 +2,7 @@ package ru.practicum.explore_with_me.event.dao;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventState;
+import ru.practicum.explore_with_me.interaction_api.model.event.EventState;
 
 import java.time.LocalDateTime;
 
@@ -23,8 +23,7 @@ public class Event {
     @Column(name = "annotation", length = 2000)
     String annotation;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
+    @Column(name = "category_id", nullable = false)
     Long category_id;
 
     @Transient
@@ -45,8 +44,7 @@ public class Event {
     @Column(name = "event_date")
     LocalDateTime eventDate;
 
-    @ManyToOne
-    @JoinColumn(name = "initiator_id")
+    @Column(name = "initiator_id", nullable = false)
     Long initiator_id;
 
     @Embedded

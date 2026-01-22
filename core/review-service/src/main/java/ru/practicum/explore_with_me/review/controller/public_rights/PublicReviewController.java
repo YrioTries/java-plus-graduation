@@ -1,4 +1,4 @@
-package ru.practicum.explore_with_me.review.collector.public_rights;
+package ru.practicum.explore_with_me.review.controller.public_rights;
 
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
