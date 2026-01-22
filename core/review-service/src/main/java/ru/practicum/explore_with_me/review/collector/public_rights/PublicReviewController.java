@@ -1,0 +1,29 @@
+package ru.practicum.explore_with_me.review.collector.public_rights;
+
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.explore_with_me.interaction_api.model.review.dto.ReviewDto;
+import ru.practicum.explore_with_me.review.service.public_rights.PublicReviewService;
+
+import java.util.List;
+
+@Slf4j
+@Validated
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/reviews")
+public class PublicReviewController {
+    private final PublicReviewService reviewService;
+
+    @GetMapping("/{eventId}")
+    public List<ReviewDto> getEventReviewsByPublic(@Positive @PathVariable Long eventId,
+                                                   @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                   @Positive @RequestParam(defaultValue = "10") Integer size) {
+        log.info("GET-запрос публичного контроллера на получение списка отзывов к ивенту с id={}", eventId);
+        return reviewService.getEventReviewsByPublic(eventId, from, size);
+    }
+}

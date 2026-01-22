@@ -1,18 +1,18 @@
-package ru.practicum.explore_with_me.controller.privates;
+package ru.practicum.explore_with_me.event.controller.private_rights;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explore_with_me.model.dto.event.EventFullDto;
-import ru.practicum.explore_with_me.model.dto.event.EventShortDto;
-import ru.practicum.explore_with_me.model.dto.event.NewEventDto;
+import ru.practicum.explore_with_me.event.service.private_rights.PrivateEventService;
+import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventFullDto;
+import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDto;
+import ru.practicum.explore_with_me.interaction_api.model.event.dto.NewEventDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.UpdateEventUserRequest;
-import ru.practicum.explore_with_me.service.event.PrivateEventService;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 @Validated

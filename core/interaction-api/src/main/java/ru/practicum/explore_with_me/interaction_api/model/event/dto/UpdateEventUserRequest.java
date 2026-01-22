@@ -1,4 +1,4 @@
-package ru.practicum.explore_with_me.model.dto.event;
+package ru.practicum.explore_with_me.interaction_api.model.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import ru.practicum.explore_with_me.model.dto.LocationDto;
 
 import java.time.LocalDateTime;
 

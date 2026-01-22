@@ -1,4 +1,4 @@
-package ru.practicum.explore_with_me.model.dao;
+package ru.practicum.explore_with_me.event.dao;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

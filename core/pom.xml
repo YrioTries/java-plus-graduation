@@ -19,6 +19,9 @@
         <module>interaction-api</module>
         <module>category-service</module>
         <module>event-service</module>
+        <module>review-service</module>
+        <module>compilation-service</module>
+        <module>request-service</module>
     </modules>
 
     <dependencies>
