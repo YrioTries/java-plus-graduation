@@ -4,7 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.explore_with_me.category.dao.Category;
+import ru.practicum.explore_with_me.category.mapper.CategoryMapper;
+import ru.practicum.explore_with_me.category.repository.CategoryRepository;
 import ru.practicum.explore_with_me.interaction_api.exception.ConflictException;
+import ru.practicum.explore_with_me.interaction_api.exception.NotFoundException;
 import ru.practicum.explore_with_me.interaction_api.model.category.dto.CategoryDto;
 import ru.practicum.explore_with_me.interaction_api.model.category.dto.NewCategoryDto;
 
@@ -13,7 +17,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class CategoryServiceImpl implements ru.practicum.explore_with_me.service.category.CategoryService {
+public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final EventRepository eventRepository;
     private final CategoryMapper categoryMapper;
