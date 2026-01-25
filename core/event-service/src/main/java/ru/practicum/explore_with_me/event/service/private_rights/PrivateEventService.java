@@ -1,10 +1,10 @@
 package ru.practicum.explore_with_me.event.service.private_rights;
 
 import org.springframework.data.domain.Pageable;
+import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventFullDto;
+import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDto;
+import ru.practicum.explore_with_me.interaction_api.model.event.dto.NewEventDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.UpdateEventUserRequest;
-import ru.practicum.explore_with_me.model.dto.event.EventFullDto;
-import ru.practicum.explore_with_me.model.dto.event.EventShortDto;
-import ru.practicum.explore_with_me.model.dto.event.NewEventDto;
 
 import java.util.List;
 

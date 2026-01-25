@@ -11,6 +11,8 @@ import ru.practicum.explore_with_me.interaction_api.exception.NotFoundException;
 import ru.practicum.explore_with_me.interaction_api.model.compilation.dto.CompilationDto;
 import ru.practicum.explore_with_me.interaction_api.model.compilation.dto.NewCompilationDto;
 import ru.practicum.explore_with_me.interaction_api.model.compilation.dto.UpdateCompilationRequest;
+import ru.practicum.explore_with_me.interaction_api.model.event.client.EventServiceClient;
+import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDto;
 
 import java.util.HashSet;
 import java.util.List;
@@ -21,21 +23,27 @@ import java.util.Set;
 @Transactional(readOnly = true)
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
-    private final EventRepository eventRepository;
     private final CompilationMapper compilationMapper;
+
+    private final EventServiceClient eventServiceClient;
 
     @Override
     @Transactional
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
         Compilation compilation = compilationMapper.toCompilation(newCompilationDto);
 
-        Set<Event> events;
+        Set<Long> events;
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
-            events = new HashSet<>(eventRepository.findAllById(newCompilationDto.getEvents()));
+            events = new HashSet<>(eventServiceClient
+                    .findAllEventsClient(newCompilationDto.getEvents())
+                    .stream()
+                    .map(EventShortDto::getId)
+                    .toList());
+
         } else {
             events = new HashSet<>();
         }
-        compilation.setEvents(events);
+        compilation.setEventsId(events);
 
         Compilation savedCompilation = compilationRepository.save(compilation);
         return compilationMapper.toCompilationDto(savedCompilation);
@@ -58,8 +66,12 @@ public class CompilationServiceImpl implements CompilationService {
                 .orElseThrow(() -> new NotFoundException("Compilation not found"));
 
         if (updateRequest.getEvents() != null) {
-            Set<Event> events = new HashSet<>(eventRepository.findAllById(updateRequest.getEvents()));
-            compilation.setEvents(events);
+            Set<Long> events = new HashSet<>(eventServiceClient
+                    .findAllEventsClient(updateRequest.getEvents())
+                    .stream()
+                    .map(EventShortDto::getId)
+                    .toList());
+            compilation.setEventsId(events);
         }
         if (updateRequest.getPinned() != null) {
             compilation.setPinned(updateRequest.getPinned());

@@ -1,67 +1,69 @@
 package ru.practicum.explore_with_me.event.service.private_rights;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.explore_with_me.exception.BadRequestException;
-import ru.practicum.explore_with_me.exception.ConflictException;
-import ru.practicum.explore_with_me.exception.NotFoundException;
+import ru.practicum.explore_with_me.event.dao.Event;
+import ru.practicum.explore_with_me.event.dao.Location;
+import ru.practicum.explore_with_me.event.mapper.EventMapper;
+import ru.practicum.explore_with_me.event.repository.EventRepository;
+import ru.practicum.explore_with_me.interaction_api.exception.BadRequestException;
+import ru.practicum.explore_with_me.interaction_api.exception.ConflictException;
+import ru.practicum.explore_with_me.interaction_api.exception.NotFoundException;
+import ru.practicum.explore_with_me.interaction_api.model.category.client.CategoryServiceClient;
+import ru.practicum.explore_with_me.interaction_api.model.category.dto.CategoryDto;
+import ru.practicum.explore_with_me.interaction_api.model.event.EventState;
+import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventFullDto;
+import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDto;
+import ru.practicum.explore_with_me.interaction_api.model.event.dto.NewEventDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.UpdateEventUserRequest;
-import ru.practicum.explore_with_me.model.dao.Category;
-import ru.practicum.explore_with_me.model.dao.Event;
-import ru.practicum.explore_with_me.model.dao.Location;
-import ru.practicum.explore_with_me.model.dao.User;
-import ru.practicum.explore_with_me.model.dto.event.EventFullDto;
-import ru.practicum.explore_with_me.model.dto.event.EventShortDto;
-import ru.practicum.explore_with_me.model.dto.event.NewEventDto;
-import ru.practicum.explore_with_me.model.enums.EventState;
-import ru.practicum.explore_with_me.model.mapper.EventMapper;
-import ru.practicum.explore_with_me.repository.CategoryRepository;
-import ru.practicum.explore_with_me.repository.EventRepository;
-import ru.practicum.explore_with_me.repository.UserRepository;
+import ru.practicum.explore_with_me.interaction_api.model.user.client.UserServiceClient;
+import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PrivateEventServiceImpl implements ru.practicum.explore_with_me.service.event.PrivateEventService {
+public class PrivateEventServiceImpl implements PrivateEventService {
     private final EventRepository eventRepository;
-    private final UserRepository userRepository;
-    private final CategoryRepository categoryRepository;
     private final EventMapper eventMapper;
+    private final UserServiceClient userServiceClient;
+    private final CategoryServiceClient categoryServiceClient;
 
+    private static final String serviceName = "[PrivateEventServiceImpl]";
 
     @Override
     public List<EventShortDto> getEventsByUser(Long userId, Pageable pageable) {
-        if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("User not found");
-        }
+        log.debug("UserServiceClient validateUserExistingById received request from {}", serviceName);
 
-        return eventRepository.findByInitiatorId(userId, pageable)
+        userServiceClient.validateUserExistingById(userId);
+
+        return eventRepository.findByInitiator_id(userId, pageable)
                 .map(eventMapper::toEventShortDto)
                 .getContent();
     }
 
-
     @Override
     @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
-        Category category = categoryRepository.findById(newEventDto.getCategory())
-                .orElseThrow(() -> new NotFoundException("Категория не найдена"));
+        log.debug("Call getUserShortDtoClientById of user-service client from {}", serviceName);
+        UserShortDto user = userServiceClient.getUserShortDtoClientById(userId);
+        //Уже с валидацией
+        CategoryDto category = categoryServiceClient.getCategoryById(newEventDto.getCategory());
 
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new BadRequestException("До даты мероприятия должно быть не менее 2 часов");
         }
 
         Event event = eventMapper.toEvent(newEventDto);
-        event.setInitiator(user);
+        event.setInitiatorId(user.getId());
         event.setConfirmedRequests(0);
-        event.setCategory(category);
+        event.setCategoryId(category.getId());
         event.setCreatedOn(LocalDateTime.now());
         event.setState(EventState.PENDING);
 
@@ -79,24 +81,22 @@ public class PrivateEventServiceImpl implements ru.practicum.explore_with_me.ser
 
     @Override
     public EventFullDto getEventByUser(Long userId, Long eventId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("User not found");
-        }
+        log.debug("UserServiceClient validateUserExistingById received request getEventByUser from {}", serviceName);
+        userServiceClient.validateUserExistingById(userId);
 
-        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+        Event event = eventRepository.findByIdAndInitiator_id(eventId, userId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
         return eventMapper.toEventFullDto(event);
     }
 
-
     @Override
     @Transactional
     public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventUserRequest updateRequest) {
-        if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("User not found");
-        }
+        log.debug("UserServiceClient validateUserExistingById received request updateEventByUser from {}", serviceName);
 
-        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+        userServiceClient.validateUserExistingById(userId);
+
+        Event event = eventRepository.findByIdAndInitiator_id(eventId, userId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
 
         if (event.getState() == EventState.PUBLISHED) {
@@ -126,9 +126,8 @@ public class PrivateEventServiceImpl implements ru.practicum.explore_with_me.ser
             event.setAnnotation(updateRequest.getAnnotation());
         }
         if (updateRequest.getCategory() != null) {
-            Category category = categoryRepository.findById(updateRequest.getCategory())
-                    .orElseThrow(() -> new NotFoundException("Category not found"));
-            event.setCategory(category);
+            CategoryDto category = categoryServiceClient.getCategoryById(updateRequest.getCategory());
+            event.setCategoryId(category.getId());
         }
         if (updateRequest.getDescription() != null) {
             event.setDescription(updateRequest.getDescription());

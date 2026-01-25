@@ -1,5 +1,6 @@
 package ru.practicum.explore_with_me.event.controller.admin_rights;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -7,9 +8,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explore_with_me.model.dto.event.EventFullDto;
-import ru.practicum.explore_with_me.model.dto.event.UpdateEventAdminRequest;
-import ru.practicum.explore_with_me.service.event.EventService;
+import ru.practicum.explore_with_me.event.service.admin_rights.EventService;
+import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventFullDto;
+import ru.practicum.explore_with_me.interaction_api.model.event.dto.UpdateEventAdminRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;

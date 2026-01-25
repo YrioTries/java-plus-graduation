@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explore_with_me.model.dto.event.EventFullDto;
 import ru.practicum.explore_with_me.model.dto.event.EventShortDto;
 import ru.practicum.explore_with_me.model.dto.event.NewEventDto;
-import ru.practicum.explore_with_me.interaction_api.model.event.dto.UpdateEventUserRequest;
+import ru.practicum.explore_with_me.model.dto.event.UpdateEventUserRequest;
 import ru.practicum.explore_with_me.model.enums.EventState;
 import ru.practicum.explore_with_me.exception.BadRequestException;
 import ru.practicum.explore_with_me.exception.ConflictException;
@@ -27,7 +27,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PrivateEventServiceImpl implements ru.practicum.explore_with_me.service.event.PrivateEventService {
+public class PrivateEventServiceImpl implements PrivateEventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;

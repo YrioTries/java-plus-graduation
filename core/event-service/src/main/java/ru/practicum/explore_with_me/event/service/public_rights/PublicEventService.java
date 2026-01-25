@@ -2,11 +2,16 @@ package ru.practicum.explore_with_me.event.service.public_rights;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
+import ru.practicum.explore_with_me.event.dao.Event;
+import ru.practicum.explore_with_me.interaction_api.exception.NotFoundException;
+import ru.practicum.explore_with_me.interaction_api.model.compilation.dto.NewCompilationDto;
+import ru.practicum.explore_with_me.interaction_api.model.event.EventState;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventFullDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public interface PublicEventService {
     List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid,
@@ -15,4 +20,14 @@ public interface PublicEventService {
                                         HttpServletRequest httpServletRequest);
 
     EventFullDto getEventById(Long id, HttpServletRequest httpServletRequest);
+
+    EventShortDto getEventShortDtoByIdClient(Long id);
+
+    EventFullDto getEventFullDtoByIdClient(Long id);
+
+    void validateEventExistingById(Long eventId);
+
+    void validateCategoryForEventExisting(Long categoryId);
+
+    List<EventShortDto> findAllEventsClient(Set<Long> events);
 }

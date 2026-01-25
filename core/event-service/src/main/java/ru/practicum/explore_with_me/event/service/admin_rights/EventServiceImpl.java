@@ -1,6 +1,7 @@
-package ru.practicum.explore_with_me.event.service;
+package ru.practicum.explore_with_me.event.service.admin_rights;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -8,28 +9,36 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explore_with_me.StatResponseDto;
 import ru.practicum.explore_with_me.StatsClient;
 import ru.practicum.explore_with_me.event.dao.Event;
+import ru.practicum.explore_with_me.event.dao.Location;
 import ru.practicum.explore_with_me.event.mapper.EventMapper;
 import ru.practicum.explore_with_me.event.repository.EventRepository;
+import ru.practicum.explore_with_me.interaction_api.exception.ConflictException;
+import ru.practicum.explore_with_me.interaction_api.exception.NotFoundException;
+import ru.practicum.explore_with_me.interaction_api.model.category.client.CategoryServiceClient;
+import ru.practicum.explore_with_me.interaction_api.model.category.dto.CategoryDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventFullDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.EventState;
+import ru.practicum.explore_with_me.interaction_api.model.event.dto.UpdateEventAdminRequest;
+import ru.practicum.explore_with_me.interaction_api.model.request.RequestStatus;
+import ru.practicum.explore_with_me.interaction_api.model.request.client.ParticipationRequestServiceClient;
+import ru.practicum.explore_with_me.interaction_api.model.request.dto.ParticipationRequestDto;
+import ru.practicum.explore_with_me.interaction_api.model.user.client.UserServiceClient;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
-    private final CategoryRepository categoryRepository;
-    private final ParticipationRequestRepository requestRepository;
-
     private final EventMapper eventMapper;
-    private final CategoryMapper categoryMapper;
-    private final UserMapper userMapper;
+
+    private final UserServiceClient userServiceClient;
+    private final CategoryServiceClient categoryServiceClient;
+    private final ParticipationRequestServiceClient requestServiceClient;
 
     private final StatsClient statsClient;
 
@@ -60,15 +69,25 @@ public class EventServiceImpl implements EventService {
         }
         List<Event> events = eventRepository.findAll(spec, pageable).toList();
         Map<Long, Long> views = getEventsViews(events);
-        Map<Long, List<ParticipationRequest>> confRequests = getConfirmedRequestsCount(events);
+
+        Map<Long, List<ParticipationRequestDto>> confRequests = requestServiceClient.getConfirmedRequestsCount(
+                events.stream().map(Event::getId).toList(),
+                RequestStatus.CONFIRMED
+        );
         return events.stream()
-                .map(e -> eventMapper.toEventFullDtoWithDetails(e, categoryMapper, userMapper))
+                .map(event -> {
+                    log.debug("Call getUserShortDtoClientById of user-service client from EventServiceImpl");
+
+                    return eventMapper.toEventFullDtoWithDetails(
+                            event,
+                            categoryServiceClient.getCategoryById(event.getCategoryId()),
+                            userServiceClient.getUserShortDtoClientById(event.getInitiatorId()));
+                })
                 .peek(dto -> dto.setViews(views.getOrDefault(dto.getId(), 0L)))
                 .peek(dto -> dto.setConfirmedRequests((confRequests.getOrDefault(dto.getId(), List.of())).size()))
                 .toList();
 
     }
-
 
     @Override
     @Transactional
@@ -104,9 +123,8 @@ public class EventServiceImpl implements EventService {
             event.setAnnotation(updateRequest.getAnnotation());
         }
         if (updateRequest.getCategory() != null) {
-            Category category = categoryRepository.findById(updateRequest.getCategory())
-                    .orElseThrow(() -> new NotFoundException("Category not found"));
-            event.setCategory_id(category);
+            CategoryDto category = categoryServiceClient.getCategoryById(updateRequest.getCategory());
+            event.setCategoryId(category.getId());
         }
         if (updateRequest.getDescription() != null) {
             event.setDescription(updateRequest.getDescription());
@@ -156,10 +174,5 @@ public class EventServiceImpl implements EventService {
         return viewStats;
     }
 
-    private Map<Long, List<ParticipationRequest>> getConfirmedRequestsCount(List<Event> events) {
-        List<ParticipationRequest> requests = requestRepository.findAllByEventIdInAndStatus(events
-                .stream().map(Event::getId).collect(Collectors.toList()), RequestStatus.CONFIRMED);
-        return requests.stream().collect(Collectors.groupingBy(r -> r.getEvent().getId()));
-    }
 
 }

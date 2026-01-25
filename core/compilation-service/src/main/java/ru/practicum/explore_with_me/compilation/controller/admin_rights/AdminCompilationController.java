@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explore_with_me.model.dto.compilation.CompilationDto;
-import ru.practicum.explore_with_me.model.dto.compilation.NewCompilationDto;
-import ru.practicum.explore_with_me.model.dto.compilation.UpdateCompilationRequest;
-import ru.practicum.explore_with_me.service.compilation.CompilationService;
+import ru.practicum.explore_with_me.compilation.service.CompilationService;
+import ru.practicum.explore_with_me.interaction_api.model.compilation.dto.CompilationDto;
+import ru.practicum.explore_with_me.interaction_api.model.compilation.dto.NewCompilationDto;
+import ru.practicum.explore_with_me.interaction_api.model.compilation.dto.UpdateCompilationRequest;
 
 @Validated
 @RestController

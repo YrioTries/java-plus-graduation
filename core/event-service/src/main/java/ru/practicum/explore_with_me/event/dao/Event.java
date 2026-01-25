@@ -24,7 +24,7 @@ public class Event {
     String annotation;
 
     @Column(name = "category_id", nullable = false)
-    Long category_id;
+    Long categoryId;
 
     @Transient
     private Long views;
@@ -45,7 +45,7 @@ public class Event {
     LocalDateTime eventDate;
 
     @Column(name = "initiator_id", nullable = false)
-    Long initiator_id;
+    Long initiatorId;
 
     @Embedded
     Location location;

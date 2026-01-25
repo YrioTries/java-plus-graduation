@@ -1,8 +1,8 @@
 package ru.practicum.explore_with_me.review.service.private_rights;
 
-import ru.practicum.explore_with_me.model.dto.review.NewReviewDto;
-import ru.practicum.explore_with_me.model.dto.review.ReviewDto;
-import ru.practicum.explore_with_me.model.dto.review.UpdateReviewDto;
+import ru.practicum.explore_with_me.interaction_api.model.review.dto.NewReviewDto;
+import ru.practicum.explore_with_me.interaction_api.model.review.dto.ReviewDto;
+import ru.practicum.explore_with_me.interaction_api.model.review.dto.UpdateReviewDto;
 
 import java.util.List;
 

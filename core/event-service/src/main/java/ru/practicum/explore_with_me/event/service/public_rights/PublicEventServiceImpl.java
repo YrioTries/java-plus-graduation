@@ -1,28 +1,30 @@
 package ru.practicum.explore_with_me.event.service.public_rights;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import ru.practicum.explore_with_me.EndpointHitDto;
 import ru.practicum.explore_with_me.StatResponseDto;
 import ru.practicum.explore_with_me.StatsClient;
 import ru.practicum.explore_with_me.event.dao.Event;
 import ru.practicum.explore_with_me.event.mapper.EventMapper;
 import ru.practicum.explore_with_me.event.repository.EventRepository;
+import ru.practicum.explore_with_me.interaction_api.exception.BadRequestException;
+import ru.practicum.explore_with_me.interaction_api.exception.ConflictException;
 import ru.practicum.explore_with_me.interaction_api.exception.NotFoundException;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventFullDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.EventState;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -74,6 +76,52 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .stream()
                 .map(eventMapper::toEventShortDto)
                 .peek(dto -> dto.setViews(views.getOrDefault(dto.getId(), 0L)))
+                .toList();
+    }
+
+    @Override
+    public void validateCategoryForEventExisting(Long categoryId) {
+        if (!eventRepository.findByCategory_id(categoryId).isEmpty()) {
+            throw new ConflictException("Category has associated events");
+        }
+    }
+
+    @Override
+    public void validateEventExistingById(Long eventId) {
+        if (!eventRepository.existsById(eventId)) {
+            throw new NotFoundException("Ивента с id=" + eventId + " нет в БД!");
+        }
+    }
+
+    @Override
+    public EventShortDto getEventShortDtoByIdClient(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Event with the same id not found"));
+
+        if (event.getState() != EventState.PUBLISHED) {
+            throw new NotFoundException("Event not found");
+        }
+
+        return eventMapper.toEventShortDto(event);
+    }
+
+    @Override
+    public EventFullDto getEventFullDtoByIdClient(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Event with the same id not found"));
+
+        if (event.getState() != EventState.PUBLISHED) {
+            throw new NotFoundException("Event not found");
+        }
+
+        return eventMapper.toEventFullDto(event);
+    }
+
+    @Override
+    public List<EventShortDto> findAllEventsClient(Set<Long> events) {
+        return eventRepository.findAllById(events)
+                .stream()
+                .map(eventMapper::toEventShortDto)
                 .toList();
     }
 

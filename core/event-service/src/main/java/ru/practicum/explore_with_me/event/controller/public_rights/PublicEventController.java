@@ -9,11 +9,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explore_with_me.event.service.public_rights.PublicEventService;
+import ru.practicum.explore_with_me.interaction_api.model.compilation.dto.NewCompilationDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventFullDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Validated
 @RestController
@@ -42,5 +44,30 @@ public class PublicEventController {
     public EventFullDto getEventById(@PathVariable @Positive Long id,
                                      HttpServletRequest httpRequest) {
         return publicEventService.getEventById(id, httpRequest);
+    }
+
+    @GetMapping("/client/short/{id}")
+    public EventShortDto getEventShortDtoByIdClient(@PathVariable @Positive Long id) {
+        return publicEventService.getEventShortDtoByIdClient(id);
+    }
+
+    @GetMapping("/client/full/{id}")
+    EventFullDto getEventFullDtoByIdClient(@PathVariable @Positive Long id) {
+        return publicEventService.getEventFullDtoByIdClient(id);
+    }
+
+    @GetMapping("/client/validate/{eventId}")
+    public void validateEventExistingById(@PathVariable @Positive Long eventId) {
+        publicEventService.validateEventExistingById(eventId);
+    }
+
+    @GetMapping("/client/validate/category/{categoryId}")
+    public void validateCategoryForEventExisting(@PathVariable @Positive Long categoryId) {
+        publicEventService.validateCategoryForEventExisting(categoryId);
+    }
+
+    @GetMapping("/client/find/all")
+    public List<EventShortDto> findAllEventsClient(Set<Long> events) {
+        return publicEventService.findAllEventsClient(events);
     }
 }

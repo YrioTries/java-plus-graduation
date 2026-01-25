@@ -1,4 +1,4 @@
-package ru.practicum.explore_with_me.event.service;
+package ru.practicum.explore_with_me.event.service.admin_rights;
 
 import org.springframework.data.domain.Pageable;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventFullDto;

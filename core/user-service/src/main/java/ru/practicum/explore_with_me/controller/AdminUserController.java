@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import ru.practicum.explore_with_me.interaction_api.model.user.dto.NewUserRequest;
 import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserDto;
+import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserShortDto;
 import ru.practicum.explore_with_me.service.UserService;
 
 import java.util.List;
@@ -26,6 +27,16 @@ public class AdminUserController {
                                   @RequestParam(defaultValue = "0") int from,
                                   @RequestParam(defaultValue = "10") int size) {
         return userService.getUsers(ids, PageRequest.of(from / size, size));
+    }
+
+    @GetMapping("/client/exist/{userId}")
+    public void validateUserExistingById(@PathVariable Long userId) {
+        userService.validateUserExistingById(userId);
+    }
+
+    @GetMapping("/client/{userId}")
+    public UserShortDto getUserClientById(@PathVariable Long userId, @RequestParam("service") String serviceName) {
+        return userService.getUserShortDtoClientById(userId);
     }
 
     @PostMapping

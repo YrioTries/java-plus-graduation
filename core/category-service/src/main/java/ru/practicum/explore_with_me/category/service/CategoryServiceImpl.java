@@ -1,6 +1,8 @@
 package ru.practicum.explore_with_me.category.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,16 +13,21 @@ import ru.practicum.explore_with_me.interaction_api.exception.ConflictException;
 import ru.practicum.explore_with_me.interaction_api.exception.NotFoundException;
 import ru.practicum.explore_with_me.interaction_api.model.category.dto.CategoryDto;
 import ru.practicum.explore_with_me.interaction_api.model.category.dto.NewCategoryDto;
+import ru.practicum.explore_with_me.interaction_api.model.event.client.EventServiceClient;
 
 import java.util.List;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
-    private final EventRepository eventRepository;
     private final CategoryMapper categoryMapper;
+    private final EventServiceClient eventServiceClient;
+
+    private static final String serviceName = "[CATEGORY-SERVICE]";
 
     @Override
     @Transactional
@@ -40,9 +47,8 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
 
-        if (!eventRepository.findByCategoryId(catId).isEmpty()) {
-            throw new ConflictException("Cannot delete category with associated events");
-        }
+        log.debug("Запрос на получение event клиентом из deleteCategory сервиса {}", serviceName);
+        eventServiceClient.validateCategoryForEventExisting(catId);
 
         categoryRepository.delete(category);
     }

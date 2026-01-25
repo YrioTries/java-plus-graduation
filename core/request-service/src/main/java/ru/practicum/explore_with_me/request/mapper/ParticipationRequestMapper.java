@@ -8,15 +8,7 @@ import ru.practicum.explore_with_me.request.dao.ParticipationRequest;
 @Mapper(componentModel = "spring")
 public interface ParticipationRequestMapper {
 
-    @Mapping(target = "event", source = "event.id")
-    @Mapping(target = "requester", source = "requester.id")
+    @Mapping(target = "eventId", source = "eventId")
+    @Mapping(target = "requesterId", source = "requesterId")
     ParticipationRequestDto toParticipationRequestDto(ParticipationRequest participationRequest);
-
-    default Long mapEventToLong(Event event) {
-        return event != null ? event.getId() : null;
-    }
-
-    default Long mapUserToLong(User user) {
-        return user != null ? user.getId() : null;
-    }
 }

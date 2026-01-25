@@ -3,7 +3,7 @@ package ru.practicum.explore_with_me.interaction_api.model.request.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.explore_with_me.model.enums.RequestStatus;
+import ru.practicum.explore_with_me.interaction_api.model.request.RequestStatus;
 
 import java.util.Set;
 

@@ -1,25 +1,36 @@
 package ru.practicum.explore_with_me.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explore_with_me.dao.User;
-import ru.practicum.explore_with_me.exception.ConflictException;
+import ru.practicum.explore_with_me.interaction_api.exception.ConflictException;
+import ru.practicum.explore_with_me.interaction_api.exception.NotFoundException;
 import ru.practicum.explore_with_me.interaction_api.model.user.dto.NewUserRequest;
 import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserDto;
+import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserShortDto;
 import ru.practicum.explore_with_me.mapper.UserMapper;
 import ru.practicum.explore_with_me.repository.UserRepository;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements ru.practicum.explore_with_me.service.UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    @Transactional(readOnly = true)
+    @Override
+    public UserShortDto getUserShortDtoClientById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
+        return userMapper.toUserShortDto(user);
+    }
+
     @Override
     public List<UserDto> getUsers(List<Long> ids, Pageable pageable) {
         if (ids != null && !ids.isEmpty()) {
@@ -52,5 +63,11 @@ public class UserServiceImpl implements ru.practicum.explore_with_me.service.Use
             throw new NotFoundException("User not found");
         }
         userRepository.deleteById(userId);
+    }
+
+    @Override
+    public void validateUserExistingById(Long userId) {
+        if (!userRepository.existsById(userId))
+            throw new NotFoundException("User with id=" + userId + " not found");
     }
 }

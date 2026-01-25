@@ -22,13 +22,10 @@ public class ParticipationRequest {
     Long id;
     @Builder.Default
     LocalDateTime created = LocalDateTime.now();
-    @ManyToOne
-    @JoinColumn(name = "event_id")
-    Long event_id;
-    @ManyToOne
-    @JoinColumn(name = "requester_id")
-    Long requester_id;
+    @Column(name = "event_id")
+    Long eventId;
+    @Column(name = "requester_id")
+    Long requesterId;
     @Enumerated(value = EnumType.STRING)
     RequestStatus status;
-
 }

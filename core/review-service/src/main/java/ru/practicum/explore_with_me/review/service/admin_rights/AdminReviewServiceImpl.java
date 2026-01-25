@@ -6,18 +6,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.explore_with_me.exception.NotFoundException;
-import ru.practicum.explore_with_me.model.dao.Review;
-import ru.practicum.explore_with_me.model.dto.review.ReviewDto;
-import ru.practicum.explore_with_me.model.mapper.ReviewMapper;
-import ru.practicum.explore_with_me.repository.ReviewRepository;
+import ru.practicum.explore_with_me.interaction_api.exception.NotFoundException;
+import ru.practicum.explore_with_me.interaction_api.model.review.dto.ReviewDto;
+import ru.practicum.explore_with_me.review.dao.Review;
+import ru.practicum.explore_with_me.review.mapper.ReviewMapper;
+import ru.practicum.explore_with_me.review.repository.ReviewRepository;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AdminReviewServiceImpl implements ru.practicum.explore_with_me.service.review.admin_rights.AdminReviewService {
+public class AdminReviewServiceImpl implements AdminReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
 

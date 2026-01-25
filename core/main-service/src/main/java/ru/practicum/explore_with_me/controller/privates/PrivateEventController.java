@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.explore_with_me.model.dto.event.EventFullDto;
 import ru.practicum.explore_with_me.model.dto.event.EventShortDto;
 import ru.practicum.explore_with_me.model.dto.event.NewEventDto;
-import ru.practicum.explore_with_me.interaction_api.model.event.dto.UpdateEventUserRequest;
+import ru.practicum.explore_with_me.model.dto.event.UpdateEventUserRequest;
 import ru.practicum.explore_with_me.service.event.PrivateEventService;
 
 import jakarta.validation.Valid;

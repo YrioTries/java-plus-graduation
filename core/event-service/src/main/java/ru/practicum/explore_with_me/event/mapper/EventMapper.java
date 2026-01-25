@@ -6,17 +6,19 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import ru.practicum.explore_with_me.event.dao.Event;
 import ru.practicum.explore_with_me.event.dao.Location;
+import ru.practicum.explore_with_me.interaction_api.model.category.dto.CategoryDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventFullDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.LocationDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.NewEventDto;
+import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserShortDto;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "category", ignore = true)
-    @Mapping(target = "initiator", ignore = true)
+    @Mapping(target = "categoryId", ignore = true)
+    @Mapping(target = "initiatorId", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
@@ -24,12 +26,12 @@ public interface EventMapper {
     @Mapping(target = "views", ignore = true)
     Event toEvent(NewEventDto newEventDto);
 
-    @Mapping(target = "category")
-    @Mapping(target = "initiator")
+    @Mapping(target = "categoryId")
+    @Mapping(target = "initiatorId")
     EventFullDto toEventFullDto(Event event);
 
-    @Mapping(target = "category")
-    @Mapping(target = "initiator")
+    @Mapping(target = "categoryId")
+    @Mapping(target = "initiatorId")
     EventShortDto toEventShortDto(Event event);
 
     default Location toLocation(LocationDto dto) {
@@ -55,24 +57,24 @@ public interface EventMapper {
         }
     }
 
-    default EventFullDto toEventFullDtoWithDetails(Event event, CategoryMapper categoryMapper, UserMapper userMapper) {
+    default EventFullDto toEventFullDtoWithDetails(Event event, CategoryDto categoryDto, UserShortDto userShortDto) {
         EventFullDto dto = toEventFullDto(event);
-        if (event.getCategory_id() != null) {
-            dto.setCategory(categoryMapper.toCategoryDto(event.getCategory_id()));
+        if (event.getCategoryId() != null) {
+            dto.setCategory(categoryDto);
         }
-        if (event.getInitiator_id() != null) {
-            dto.setInitiator(userMapper.toUserShortDto(event.getInitiator_id()));
+        if (event.getInitiatorId() != null) {
+            dto.setInitiator(userShortDto);
         }
         return dto;
     }
 
-    default EventShortDto toEventShortDtoWithDetails(Event event, CategoryMapper categoryMapper, UserMapper userMapper) {
+    default EventShortDto toEventShortDtoWithDetails(Event event, CategoryDto categoryDto, UserShortDto userShortDto) {
         EventShortDto dto = toEventShortDto(event);
-        if (event.getCategory_id() != null) {
-            dto.setCategory(categoryMapper.toCategoryDto(event.getCategory_id()));
+        if (event.getCategoryId() != null) {
+            dto.setCategory(categoryDto);
         }
-        if (event.getInitiator_id() != null) {
-            dto.setInitiator(userMapper.toUserShortDto(event.getInitiator_id()));
+        if (event.getInitiatorId() != null) {
+            dto.setInitiator(userShortDto);
         }
         return dto;
     }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -25,8 +26,11 @@ public class Compilation {
     @Column(name = "title", nullable = false)
     String title;
 
-    @ManyToMany
-    @JoinTable(joinColumns = @JoinColumn(name = "compilation_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id"))
-    Set<Long> events;
+    @ElementCollection(targetClass = Long.class)
+    @CollectionTable(
+            name = "compilation_events",
+            joinColumns = @JoinColumn(name = "compilation_id")
+    )
+    @Column(name = "event_id")
+    private Set<Long> eventsId = new HashSet<>();
 }
