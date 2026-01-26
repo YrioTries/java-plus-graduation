@@ -16,11 +16,11 @@ import java.util.Set;
 
 public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
 
-    Page<Event> findByInitiator_id(Long userId, Pageable pageable);
+    Page<Event> findByInitiatorId(Long userId, Pageable pageable);
 
     Set<Event> findAllByIdIn(Set<Long> eventIds);
 
-    Optional<Event> findByIdAndInitiator_id(Long eventId, Long userId);
+    Optional<Event> findByIdAndInitiatorId(Long eventId, Long userId);
 
     List<Event> findByCategory_id(Long categoryId);
 

@@ -44,7 +44,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         userServiceClient.validateUserExistingById(userId);
 
-        return eventRepository.findByInitiator_id(userId, pageable)
+        return eventRepository.findByInitiatorId(userId, pageable)
                 .map(eventMapper::toEventShortDto)
                 .getContent();
     }
@@ -85,7 +85,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         log.debug("UserServiceClient validateUserExistingById received request getEventByUser from {}", serviceName);
         userServiceClient.validateUserExistingById(userId);
 
-        Event event = eventRepository.findByIdAndInitiator_id(eventId, userId)
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
         return eventMapper.toEventFullDto(event);
     }
@@ -97,7 +97,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         userServiceClient.validateUserExistingById(userId);
 
-        Event event = eventRepository.findByIdAndInitiator_id(eventId, userId)
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
 
         if (event.getState() == EventState.PUBLISHED) {
