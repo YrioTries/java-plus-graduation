@@ -31,6 +31,7 @@ public class Compilation {
             name = "compilation_events",
             joinColumns = @JoinColumn(name = "compilation_id")
     )
+    @Builder.Default
     @Column(name = "event_id")
     private Set<Long> eventsId = new HashSet<>();
 }
