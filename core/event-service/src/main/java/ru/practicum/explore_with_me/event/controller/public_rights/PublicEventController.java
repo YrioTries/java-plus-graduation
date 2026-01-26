@@ -67,7 +67,7 @@ public class PublicEventController {
     }
 
     @GetMapping("/client/find/all")
-    public List<EventShortDto> findAllEventsClient(Set<Long> events) {
-        return publicEventService.findAllEventsClient(events);
+    public Set<EventShortDto> getEventShortDtoSetByIds(@RequestParam Set<Long> eventIds) {
+        return publicEventService.getEventShortDtoSetByIds(eventIds);
     }
 }

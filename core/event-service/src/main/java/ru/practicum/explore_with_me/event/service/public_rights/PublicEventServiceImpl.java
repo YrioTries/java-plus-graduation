@@ -106,6 +106,14 @@ public class PublicEventServiceImpl implements PublicEventService {
     }
 
     @Override
+    public Set<EventShortDto> getEventShortDtoSetByIds(Set<Long> eventIds) {
+        return eventRepository.findAllByIdIn(eventIds)
+                .stream()
+                .map(eventMapper::toEventShortDto)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
     public EventFullDto getEventFullDtoByIdClient(Long id) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Event with the same id not found"));
@@ -115,14 +123,6 @@ public class PublicEventServiceImpl implements PublicEventService {
         }
 
         return eventMapper.toEventFullDto(event);
-    }
-
-    @Override
-    public List<EventShortDto> findAllEventsClient(Set<Long> events) {
-        return eventRepository.findAllById(events)
-                .stream()
-                .map(eventMapper::toEventShortDto)
-                .toList();
     }
 
     @Override

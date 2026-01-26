@@ -23,11 +23,11 @@ public interface PublicEventService {
 
     EventShortDto getEventShortDtoByIdClient(Long id);
 
+    Set<EventShortDto> getEventShortDtoSetByIds(Set<Long> eventIds);
+
     EventFullDto getEventFullDtoByIdClient(Long id);
 
     void validateEventExistingById(Long eventId);
 
     void validateCategoryForEventExisting(Long categoryId);
-
-    List<EventShortDto> findAllEventsClient(Set<Long> events);
 }

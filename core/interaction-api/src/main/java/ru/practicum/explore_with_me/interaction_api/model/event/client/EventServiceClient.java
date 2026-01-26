@@ -34,5 +34,5 @@ public interface EventServiceClient {
             @PathVariable @Positive Long categoryId);
 
     @GetMapping("/client/find/all")
-    List<EventShortDto> findAllEventsClient(Set<Long> events);
+    Set<EventShortDto> getEventShortDtoSetByIds(@RequestParam Set<Long> eventIds);
 }

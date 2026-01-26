@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.explore_with_me.compilation.dao.Compilation;
 import ru.practicum.explore_with_me.compilation.mapper.CompilationMapper;
 import ru.practicum.explore_with_me.compilation.repository.CompilationRepository;
@@ -32,23 +34,21 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
         Compilation compilation = compilationMapper.toCompilation(newCompilationDto);
 
-        Set<Long> events;
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
-            events = new HashSet<>(eventServiceClient
-                    .findAllEventsClient(newCompilationDto.getEvents())
-                    .stream()
-                    .map(EventShortDto::getId)
-                    .toList());
-
-        } else {
-            events = new HashSet<>();
+            Set<EventShortDto> events = eventServiceClient.getEventShortDtoSetByIds(newCompilationDto.getEvents());
+            if (events.size() != newCompilationDto.getEvents().size()) {
+                throw new NotFoundException("Некоторые события не найдены");
+            }
+            compilation.setEventsId(newCompilationDto.getEvents()); // Сохраняем только ID
         }
-        compilation.setEventsId(events);
 
         Compilation savedCompilation = compilationRepository.save(compilation);
-        return compilationMapper.toCompilationDto(savedCompilation);
-    }
 
+        CompilationDto compilationDto = compilationMapper.toCompilationDto(savedCompilation);
+        compilationDto.setEvents(eventServiceClient.getEventShortDtoSetByIds(savedCompilation.getEventsId()));
+
+        return compilationDto;
+    }
 
     @Override
     @Transactional
@@ -66,13 +66,15 @@ public class CompilationServiceImpl implements CompilationService {
                 .orElseThrow(() -> new NotFoundException("Compilation not found"));
 
         if (updateRequest.getEvents() != null) {
-            Set<Long> events = new HashSet<>(eventServiceClient
-                    .findAllEventsClient(updateRequest.getEvents())
-                    .stream()
-                    .map(EventShortDto::getId)
-                    .toList());
-            compilation.setEventsId(events);
+            if (!updateRequest.getEvents().isEmpty()) {
+                Set<EventShortDto> events = eventServiceClient.getEventShortDtoSetByIds(updateRequest.getEvents());
+                if (events.size() != updateRequest.getEvents().size()) {
+                    throw new NotFoundException("Некоторые события не найдены");
+                }
+            }
+            compilation.setEventsId(updateRequest.getEvents());
         }
+
         if (updateRequest.getPinned() != null) {
             compilation.setPinned(updateRequest.getPinned());
         }
@@ -81,7 +83,10 @@ public class CompilationServiceImpl implements CompilationService {
         }
 
         Compilation updatedCompilation = compilationRepository.save(compilation);
-        return compilationMapper.toCompilationDto(updatedCompilation);
+
+        CompilationDto compilationDto = compilationMapper.toCompilationDto(updatedCompilation);
+        compilationDto.setEvents(eventServiceClient.getEventShortDtoSetByIds(updatedCompilation.getEventsId()));
+        return compilationDto;
     }
 
     @Override

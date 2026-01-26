@@ -12,19 +12,22 @@ import ru.practicum.explore_with_me.interaction_api.model.event.EventState;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
 
     Page<Event> findByInitiator_id(Long userId, Pageable pageable);
+
+    Set<Event> findAllByIdIn(Set<Long> eventIds);
 
     Optional<Event> findByIdAndInitiator_id(Long eventId, Long userId);
 
     List<Event> findByCategory_id(Long categoryId);
 
     @Query("SELECT e FROM Event e WHERE " +
-            "(:users IS NULL OR e.initiator_id IN :users) AND " +
+            "(:users IS NULL OR e.initiatorId IN :users) AND " +
             "(:states IS NULL OR e.state IN :states) AND " +
-            "(:categories IS NULL OR e.category_id IN :categories) AND " +
+            "(:categories IS NULL OR e.categoryId IN :categories) AND " +
             "(e.eventDate BETWEEN :rangeStart AND :rangeEnd)")
     Page<Event> findEventsByAdmin(@Param("users") List<Long> users,
                                   @Param("states") List<EventState> states,
