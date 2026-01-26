@@ -12,5 +12,6 @@ public interface CompilationMapper {
     @Mapping(target = "events", ignore = true)
     Compilation toCompilation(NewCompilationDto newCompilationDto);
 
+    @Mapping(target = "events", ignore = true)
     CompilationDto toCompilationDto(Compilation compilation);
 }
