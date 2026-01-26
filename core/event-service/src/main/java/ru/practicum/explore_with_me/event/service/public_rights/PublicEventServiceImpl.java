@@ -1,15 +1,12 @@
 package ru.practicum.explore_with_me.event.service.public_rights;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.practicum.explore_with_me.EndpointHitDto;
 import ru.practicum.explore_with_me.StatResponseDto;
 import ru.practicum.explore_with_me.StatsClient;
@@ -81,7 +78,7 @@ public class PublicEventServiceImpl implements PublicEventService {
 
     @Override
     public void validateCategoryForEventExisting(Long categoryId) {
-        if (!eventRepository.findByCategory_id(categoryId).isEmpty()) {
+        if (!eventRepository.findByCategoryId(categoryId).isEmpty()) {
             throw new ConflictException("Category has associated events");
         }
     }

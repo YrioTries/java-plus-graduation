@@ -22,7 +22,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
 
     Optional<Event> findByIdAndInitiatorId(Long eventId, Long userId);
 
-    List<Event> findByCategory_id(Long categoryId);
+    List<Event> findByCategoryId(Long categoryId);
 
     @Query("SELECT e FROM Event e WHERE " +
             "(:users IS NULL OR e.initiatorId IN :users) AND " +
