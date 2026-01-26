@@ -20,7 +20,7 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
 
     List<ParticipationRequest> findByIdIn(List<Long> requestIds);
 
-    @Query("SELECT COUNT(pr) FROM ParticipationRequest pr WHERE pr.event.id = :eventId AND pr.status = 'CONFIRMED'")
+    @Query("SELECT COUNT(pr) FROM ParticipationRequest pr WHERE pr.eventId = :eventId AND pr.status = 'CONFIRMED'")
     Long countConfirmedRequestsByEventId(@Param("eventId") Long eventId);
 
     List<ParticipationRequest> findByEventIdAndStatus(Long eventId, RequestStatus status);
@@ -32,6 +32,6 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
     void updateStatusForRequests(@Param("requestIds") List<Long> requestIds, @Param("status") RequestStatus status);
 
     @Modifying
-    @Query("UPDATE ParticipationRequest pr SET pr.status = :status WHERE pr.event.id = :eventId AND pr.status = :currentStatus")
+    @Query("UPDATE ParticipationRequest pr SET pr.status = :status WHERE pr.eventId = :eventId AND pr.status = :currentStatus")
     void updateStatusForPendingRequests(@Param("eventId") Long eventId, @Param("currentStatus") RequestStatus currentStatus, @Param("status") RequestStatus status);
 }
