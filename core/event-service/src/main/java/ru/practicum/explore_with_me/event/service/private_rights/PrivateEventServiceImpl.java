@@ -53,7 +53,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         log.debug("Call getUserShortDtoClientById of user-service client from {}", serviceName);
-        UserShortDto user = userServiceClient.getUserShortDtoClientById(userId);
+        UserShortDto userShortDto = userServiceClient.getUserShortDtoClientById(userId);
         //Уже с валидацией
         CategoryDto category = categoryServiceClient.getCategoryById(newEventDto.getCategory());
 
@@ -62,7 +62,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         }
 
         Event event = eventMapper.toEvent(newEventDto);
-        event.setInitiatorId(user.getId());
+        event.setInitiatorId(userShortDto.getId());
         event.setConfirmedRequests(0);
         event.setCategoryId(category.getId());
         event.setCreatedOn(LocalDateTime.now());
@@ -76,6 +76,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         Event savedEvent = eventRepository.save(event);
         EventFullDto eventFullDto = eventMapper.toEventFullDto(savedEvent);
+        eventFullDto.setInitiator(userShortDto);
         eventFullDto.setLocation(newEventDto.getLocation());
         return eventFullDto;
     }

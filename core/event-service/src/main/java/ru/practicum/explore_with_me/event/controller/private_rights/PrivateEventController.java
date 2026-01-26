@@ -1,6 +1,5 @@
 package ru.practicum.explore_with_me.event.controller.private_rights;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
