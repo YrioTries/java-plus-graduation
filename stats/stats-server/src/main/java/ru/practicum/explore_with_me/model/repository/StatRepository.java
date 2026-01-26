@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface StatRepository extends JpaRepository<Stat, Long> {
 
-    @Query("SELECT new ru.practicum.StatResponseDto(s.app, s.uri, COUNT(s)) " +
+    @Query("SELECT new ru.practicum.explore_with_me.StatResponseDto(s.app, s.uri, COUNT(s)) " +
             "FROM Stat s " +
             "WHERE s.created BETWEEN :start AND :end " +
             "GROUP BY s.app, s.uri " +
@@ -19,7 +19,7 @@ public interface StatRepository extends JpaRepository<Stat, Long> {
     List<StatResponseDto> findStats(@Param("start") LocalDateTime start,
                                     @Param("end") LocalDateTime end);
 
-    @Query("SELECT new ru.practicum.StatResponseDto(s.app, s.uri, COUNT(s)) " +
+    @Query("SELECT new ru.practicum.explore_with_me.StatResponseDto(s.app, s.uri, COUNT(s)) " +
             "FROM Stat s " +
             "WHERE s.created BETWEEN :start AND :end " +
             "AND s.uri IN :uris " +
@@ -29,7 +29,7 @@ public interface StatRepository extends JpaRepository<Stat, Long> {
                                           @Param("end") LocalDateTime end,
                                           @Param("uris") List<String> uris);
 
-    @Query("SELECT new ru.practicum.StatResponseDto(s.app, s.uri, COUNT(DISTINCT s.ip)) " +
+    @Query("SELECT new ru.practicum.explore_with_me.StatResponseDto(s.app, s.uri, COUNT(DISTINCT s.ip)) " +
             "FROM Stat s " +
             "WHERE s.created BETWEEN :start AND :end " +
             "GROUP BY s.app, s.uri " +
@@ -37,7 +37,7 @@ public interface StatRepository extends JpaRepository<Stat, Long> {
     List<StatResponseDto> findUniqueStats(@Param("start") LocalDateTime start,
                                           @Param("end") LocalDateTime end);
 
-    @Query("SELECT new ru.practicum.StatResponseDto(s.app, s.uri, COUNT(DISTINCT s.ip)) " +
+    @Query("SELECT new ru.practicum.explore_with_me.StatResponseDto(s.app, s.uri, COUNT(DISTINCT s.ip)) " +
             "FROM Stat s " +
             "WHERE s.created BETWEEN :start AND :end " +
             "AND s.uri IN :uris " +
