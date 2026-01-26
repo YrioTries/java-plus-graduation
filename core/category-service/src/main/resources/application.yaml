@@ -1,6 +1,6 @@
 spring:
   application:
-    name: category-server
+    name: category-service
   config:
     import: "configserver:"
 

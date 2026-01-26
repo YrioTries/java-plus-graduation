@@ -1,6 +1,6 @@
 spring:
   application:
-    name: review-server
+    name: review-service
   config:
     import: "configserver:"
 
