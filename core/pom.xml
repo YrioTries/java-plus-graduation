@@ -32,13 +32,6 @@
         </dependency>
 
         <dependency>
-            <groupId>ru.practicum</groupId>
-            <artifactId>interaction-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
         </dependency>
