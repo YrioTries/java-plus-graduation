@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.explore_with_me.compilation.dao.Compilation;
 import ru.practicum.explore_with_me.compilation.mapper.CompilationMapper;
 import ru.practicum.explore_with_me.compilation.repository.CompilationRepository;
@@ -16,7 +14,6 @@ import ru.practicum.explore_with_me.interaction_api.model.compilation.dto.Update
 import ru.practicum.explore_with_me.interaction_api.model.event.client.EventServiceClient;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDto;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
