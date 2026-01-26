@@ -1,4 +1,4 @@
-package ru.practicum.explore_with_me.dao;
+package ru.practicum.explore_with_me.user.dao;
 
 import jakarta.persistence.*;
 import lombok.*;

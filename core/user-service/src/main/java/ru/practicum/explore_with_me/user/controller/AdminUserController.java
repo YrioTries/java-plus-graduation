@@ -1,4 +1,4 @@
-package ru.practicum.explore_with_me.controller;
+package ru.practicum.explore_with_me.user.controller;
 
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,7 @@ import jakarta.validation.Valid;
 import ru.practicum.explore_with_me.interaction_api.model.user.dto.NewUserRequest;
 import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserDto;
 import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserShortDto;
-import ru.practicum.explore_with_me.service.UserService;
+import ru.practicum.explore_with_me.user.service.UserService;
 
 import java.util.List;
 

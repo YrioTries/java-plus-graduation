@@ -1,18 +1,18 @@
-package ru.practicum.explore_with_me.service;
+package ru.practicum.explore_with_me.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.explore_with_me.dao.User;
+import ru.practicum.explore_with_me.user.dao.User;
 import ru.practicum.explore_with_me.interaction_api.exception.ConflictException;
 import ru.practicum.explore_with_me.interaction_api.exception.NotFoundException;
 import ru.practicum.explore_with_me.interaction_api.model.user.dto.NewUserRequest;
 import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserDto;
 import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserShortDto;
-import ru.practicum.explore_with_me.mapper.UserMapper;
-import ru.practicum.explore_with_me.repository.UserRepository;
+import ru.practicum.explore_with_me.user.mapper.UserMapper;
+import ru.practicum.explore_with_me.user.repository.UserRepository;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserServiceImpl implements ru.practicum.explore_with_me.service.UserService {
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
