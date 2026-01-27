@@ -85,6 +85,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     @Override
     public EventFullDto getEventByUser(Long userId, Long eventId) {
         log.debug("UserServiceClient validateUserExistingById received request getEventByUser from {}", serviceName);
+
         userServiceClient.validateUserExistingById(userId);
 
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
