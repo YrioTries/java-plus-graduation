@@ -96,7 +96,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventUserRequest updateRequest) {
         log.debug("UserServiceClient validateUserExistingById received request updateEventByUser from {}", serviceName);
 
-        userServiceClient.validateUserExistingById(userId);
+        UserShortDto userShortDto = userServiceClient.getUserShortDtoClientById(userId);
 
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
@@ -120,7 +120,9 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         updateEventFields(event, updateRequest);
         Event updatedEvent = eventRepository.save(event);
-        return eventMapper.toEventFullDto(updatedEvent);
+        EventFullDto eventFullDto = eventMapper.toEventFullDto(updatedEvent);
+        eventFullDto.setInitiator(userShortDto);
+        return eventFullDto;
     }
 
     private void updateEventFields(Event event, UpdateEventUserRequest updateRequest) {
