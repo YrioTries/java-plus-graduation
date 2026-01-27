@@ -86,6 +86,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         }
 
         Event savedEvent = eventRepository.save(event);
+
         EventFullDto eventFullDto = eventMapper.toEventFullDto(savedEvent);
         eventFullDto.setInitiator(userShortDto);
         eventFullDto.setLocation(newEventDto.getLocation());
@@ -127,8 +128,8 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         EventFullDto eventFullDto = eventMapper.toEventFullDto(updatedEvent);
         eventFullDto.setInitiator(userShortDto);
-        eventFullDto.setCategory(categoryDto);
-        eventFullDto.setLocation(updateRequest.getLocation());
+//        eventFullDto.setCategory(categoryDto);
+//        eventFullDto.setLocation(updateRequest.getLocation());
         return eventFullDto;
     }
 
