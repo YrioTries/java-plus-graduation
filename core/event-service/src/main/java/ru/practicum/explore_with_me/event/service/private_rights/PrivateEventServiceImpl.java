@@ -128,8 +128,8 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         EventFullDto eventFullDto = eventMapper.toEventFullDto(updatedEvent);
         eventFullDto.setInitiator(userShortDto);
-//        eventFullDto.setCategory(categoryDto);
-//        eventFullDto.setLocation(updateRequest.getLocation());
+        eventFullDto.setCategory(categoryDto);
+        eventFullDto.setLocation(updateRequest.getLocation());
         return eventFullDto;
     }
 
@@ -138,8 +138,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             event.setAnnotation(updateRequest.getAnnotation());
         }
         if (updateRequest.getCategory() != null) {
-            CategoryDto category = categoryServiceClient.getCategoryById(updateRequest.getCategory());
-            event.setCategoryId(category.getId());
+            event.setCategoryId(updateRequest.getCategory());
         }
         if (updateRequest.getDescription() != null) {
             event.setDescription(updateRequest.getDescription());

@@ -57,8 +57,6 @@ spring:
           uri: lb://event-service
           predicates:
             - Path=/users/{userId}/events/**
-          filters:
-            - RewritePath=/users/(?<userId>\\d+)/events/(?<segment>.*), /users/$\{userId}/events/$\{segment}
 
         - id: private-requests-route
           uri: lb://request-service
