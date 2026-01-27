@@ -138,7 +138,8 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             event.setAnnotation(updateRequest.getAnnotation());
         }
         if (updateRequest.getCategory() != null) {
-            event.setCategoryId(updateRequest.getCategory());
+            CategoryDto category = categoryServiceClient.getCategoryById(updateRequest.getCategory());
+            event.setCategoryId(category.getId());
         }
         if (updateRequest.getDescription() != null) {
             event.setDescription(updateRequest.getDescription());
