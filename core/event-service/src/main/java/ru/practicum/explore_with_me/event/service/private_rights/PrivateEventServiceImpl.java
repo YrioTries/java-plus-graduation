@@ -50,6 +50,17 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     }
 
     @Override
+    public EventFullDto getEventByUser(Long userId, Long eventId) {
+        log.debug("UserServiceClient validateUserExistingById received request getEventByUser from {}", serviceName);
+
+        userServiceClient.validateUserExistingById(userId);
+
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+                .orElseThrow(() -> new NotFoundException("Event not found"));
+        return eventMapper.toEventFullDto(event);
+    }
+
+    @Override
     @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         log.debug("Call getUserShortDtoClientById of user-service client from {}", serviceName);
@@ -80,17 +91,6 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         eventFullDto.setLocation(newEventDto.getLocation());
         eventFullDto.setCategory(categoryDto);
         return eventFullDto;
-    }
-
-    @Override
-    public EventFullDto getEventByUser(Long userId, Long eventId) {
-        log.debug("UserServiceClient validateUserExistingById received request getEventByUser from {}", serviceName);
-
-        userServiceClient.validateUserExistingById(userId);
-
-        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new NotFoundException("Event not found"));
-        return eventMapper.toEventFullDto(event);
     }
 
     @Override
@@ -127,6 +127,8 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         EventFullDto eventFullDto = eventMapper.toEventFullDto(updatedEvent);
         eventFullDto.setInitiator(userShortDto);
+        eventFullDto.setCategory(categoryDto);
+        eventFullDto.setLocation(updateRequest.getLocation());
         return eventFullDto;
     }
 
@@ -135,8 +137,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             event.setAnnotation(updateRequest.getAnnotation());
         }
         if (updateRequest.getCategory() != null) {
-            CategoryDto category = categoryServiceClient.getCategoryById(updateRequest.getCategory());
-            event.setCategoryId(category.getId());
+            event.setCategoryId(updateRequest.getCategory());
         }
         if (updateRequest.getDescription() != null) {
             event.setDescription(updateRequest.getDescription());
