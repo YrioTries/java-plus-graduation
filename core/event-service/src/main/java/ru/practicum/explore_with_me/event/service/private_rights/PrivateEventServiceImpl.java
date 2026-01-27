@@ -55,7 +55,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         log.debug("Call getUserShortDtoClientById of user-service client from {}", serviceName);
         UserShortDto userShortDto = userServiceClient.getUserShortDtoClientById(userId);
         //Уже с валидацией
-        CategoryDto category = categoryServiceClient.getCategoryById(newEventDto.getCategory());
+        CategoryDto categoryDto = categoryServiceClient.getCategoryById(newEventDto.getCategory());
 
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new BadRequestException("До даты мероприятия должно быть не менее 2 часов");
@@ -64,7 +64,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         Event event = eventMapper.toEvent(newEventDto);
         event.setInitiatorId(userShortDto.getId());
         event.setConfirmedRequests(0);
-        event.setCategoryId(category.getId());
+        event.setCategoryId(categoryDto.getId());
         event.setCreatedOn(LocalDateTime.now());
         event.setState(EventState.PENDING);
 
@@ -78,6 +78,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         EventFullDto eventFullDto = eventMapper.toEventFullDto(savedEvent);
         eventFullDto.setInitiator(userShortDto);
         eventFullDto.setLocation(newEventDto.getLocation());
+        eventFullDto.setCategory(categoryDto);
         return eventFullDto;
     }
 
@@ -101,6 +102,8 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
 
+        CategoryDto categoryDto = categoryServiceClient.getCategoryById(event.getCategoryId());
+
         if (event.getState() == EventState.PUBLISHED) {
             throw new ConflictException("Cannot update published event");
         }
@@ -120,6 +123,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         updateEventFields(event, updateRequest);
         Event updatedEvent = eventRepository.save(event);
+
         EventFullDto eventFullDto = eventMapper.toEventFullDto(updatedEvent);
         eventFullDto.setInitiator(userShortDto);
         return eventFullDto;

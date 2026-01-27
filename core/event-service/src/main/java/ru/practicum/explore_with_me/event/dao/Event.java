@@ -49,6 +49,7 @@ public class Event {
 
     @Embedded
     Location location;
+
     Boolean paid;
 
     @Column(name = "participant_limit")
