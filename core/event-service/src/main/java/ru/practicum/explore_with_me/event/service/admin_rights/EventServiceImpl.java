@@ -50,7 +50,7 @@ public class EventServiceImpl implements EventService {
         Specification<Event> spec = Specification.where(null);
         if (users != null && !users.isEmpty()) {
             spec = spec.and(((root, query, criteriaBuilder) ->
-                    root.get("initiator").get("id").in(users)));
+                    root.get("initiatorId").in(users)));
         }
         if (states != null && !states.isEmpty()) {
             spec = spec.and((root, query, criteriaBuilder) ->
@@ -58,7 +58,7 @@ public class EventServiceImpl implements EventService {
         }
         if (categories != null && !categories.isEmpty()) {
             spec = spec.and((root, query, criteriaBuilder) ->
-                    root.get("category").get("id").in(categories));
+                    root.get("categoryId").in(categories));
         }
         if (rangeEnd != null) {
             spec = spec.and((root, query, criteriaBuilder) ->

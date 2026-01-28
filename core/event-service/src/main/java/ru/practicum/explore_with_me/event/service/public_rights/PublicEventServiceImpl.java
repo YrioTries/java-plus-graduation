@@ -36,8 +36,8 @@ public class PublicEventServiceImpl implements PublicEventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
 
-    UserServiceClient userServiceClient;
-    CategoryServiceClient categoryServiceClient;
+    private final UserServiceClient userServiceClient;
+    private final CategoryServiceClient categoryServiceClient;
 
     private final StatsClient statsClient;
 
@@ -234,7 +234,7 @@ public class PublicEventServiceImpl implements PublicEventService {
 
     private Specification<Event> searchCategoryIn(List<Long> categories) {
         return (root, query, criteriaBuilder) ->
-                root.get("category").get("id").in(categories);
+                root.get("categoryId").in(categories);
     }
 
     private Specification<Event> searchAfterDate(LocalDateTime rangeStart) {
