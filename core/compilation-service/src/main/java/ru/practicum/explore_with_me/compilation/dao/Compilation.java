@@ -20,6 +20,7 @@ public class Compilation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "compilation_id")
     Long id;
+
     Boolean pinned;
 
     @Size(max = 50)
