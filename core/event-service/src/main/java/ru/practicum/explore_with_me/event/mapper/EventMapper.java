@@ -70,8 +70,7 @@ public interface EventMapper {
     default EventFullDto toEventFullDtoWithDetails(
             Event event,
             CategoryDto categoryDto,
-            UserShortDto userShortDto,
-            LocationDto locationDto
+            UserShortDto userShortDto
     ) {
         EventFullDto dto = toEventFullDto(event);
         if (event.getCategoryId() != null) {
@@ -81,7 +80,10 @@ public interface EventMapper {
             dto.setInitiator(userShortDto);
         }
         if (event.getLocation() != null) {
-            dto.setLocation(locationDto);
+            dto.setLocation(toLocationDto(event.getLocation()));
+        }
+        if (event.getState() != null) {
+            dto.setState(event.getState().toString());
         }
         return dto;
     }

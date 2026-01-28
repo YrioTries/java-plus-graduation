@@ -64,11 +64,11 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         CategoryDto categoryDto = categoryServiceClient.getCategoryById(event.getCategoryId());
 
-        EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
-        eventFullDto.setInitiator(userShortDto);
-        eventFullDto.setCategory(categoryDto);
-        eventFullDto.setLocation(eventMapper.toLocationDto(event.getLocation()));
-        return eventFullDto;
+        return eventMapper.toEventFullDtoWithDetails(
+                event,
+                categoryDto,
+                userShortDto
+        );
     }
 
     @Override
@@ -98,11 +98,11 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         Event savedEvent = eventRepository.save(event);
 
-        EventFullDto eventFullDto = eventMapper.toEventFullDto(savedEvent);
-        eventFullDto.setInitiator(userShortDto);
-        eventFullDto.setLocation(newEventDto.getLocation());
-        eventFullDto.setCategory(categoryDto);
-        return eventFullDto;
+        return eventMapper.toEventFullDtoWithDetails(
+                savedEvent,
+                categoryDto,
+                userShortDto
+        );
     }
 
     @Override
@@ -137,11 +137,11 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         updateEventFields(event, updateRequest);
         Event updatedEvent = eventRepository.save(event);
 
-        EventFullDto eventFullDto = eventMapper.toEventFullDto(updatedEvent);
-        eventFullDto.setInitiator(userShortDto);
-        eventFullDto.setCategory(categoryDto);
-        eventFullDto.setLocation(updateRequest.getLocation());
-        return eventFullDto;
+        return eventMapper.toEventFullDtoWithDetails(
+                updatedEvent,
+                categoryDto,
+                userShortDto
+                );
     }
 
     private void updateEventFields(Event event, UpdateEventUserRequest updateRequest) {

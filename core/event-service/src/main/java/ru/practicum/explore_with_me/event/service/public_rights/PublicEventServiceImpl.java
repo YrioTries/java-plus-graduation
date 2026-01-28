@@ -139,8 +139,8 @@ public class PublicEventServiceImpl implements PublicEventService {
         return eventMapper.toEventFullDtoWithDetails(
                 event,
                 categoryDto,
-                userShortDto,
-                eventMapper.toLocationDto(event.getLocation()));
+                userShortDto
+        );
     }
 
     @Override
@@ -168,8 +168,8 @@ public class PublicEventServiceImpl implements PublicEventService {
         EventFullDto eventDto = eventMapper.toEventFullDtoWithDetails(
                 event,
                 categoryDto,
-                userShortDto,
-                eventMapper.toLocationDto(event.getLocation()));
+                userShortDto
+        );
 
         Map<Long, Long> views = getEventsViews(List.of(event));
         eventDto.setViews(views.getOrDefault(id, 0L));

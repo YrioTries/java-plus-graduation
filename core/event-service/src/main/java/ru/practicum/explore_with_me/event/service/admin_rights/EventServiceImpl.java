@@ -82,8 +82,8 @@ public class EventServiceImpl implements EventService {
                     return eventMapper.toEventFullDtoWithDetails(
                             event,
                             categoryServiceClient.getCategoryById(event.getCategoryId()),
-                            userServiceClient.getUserShortDtoClientById(event.getInitiatorId()),
-                            eventMapper.toLocationDto(event.getLocation()));
+                            userServiceClient.getUserShortDtoClientById(event.getInitiatorId())
+                    );
                 })
                 .peek(dto -> dto.setViews(views.getOrDefault(dto.getId(), 0L)))
                 .peek(dto -> dto.setConfirmedRequests((confRequests.getOrDefault(dto.getId(), List.of())).size()))
@@ -121,11 +121,12 @@ public class EventServiceImpl implements EventService {
         updateEventFields(event, updateRequest);
         Event updatedEvent = eventRepository.save(event);
 
-        EventFullDto eventFullDto = eventMapper.toEventFullDto(updatedEvent);
-        eventFullDto.setInitiator(userShortDto);
-        eventFullDto.setCategory(categoryDto);
-        eventFullDto.setLocation(eventMapper.toLocationDto(event.getLocation()));
-        return eventFullDto;
+        return eventMapper.toEventFullDtoWithDetails(
+                updatedEvent,
+                categoryDto,
+                userShortDto
+        );
+
     }
 
     private void updateEventFields(Event event, UpdateEventAdminRequest updateRequest) {
