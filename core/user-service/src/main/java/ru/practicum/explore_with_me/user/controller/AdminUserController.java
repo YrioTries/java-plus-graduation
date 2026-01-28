@@ -35,7 +35,7 @@ public class AdminUserController {
     }
 
     @GetMapping("/client/{userId}")
-    public UserShortDto getUserClientById(@PathVariable Long userId, @RequestParam("service") String serviceName) {
+    public UserShortDto getUserShortDtoClientById(@PathVariable Long userId) {
         return userService.getUserShortDtoClientById(userId);
     }
 

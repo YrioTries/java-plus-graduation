@@ -8,14 +8,11 @@ import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserShortDto;
 
 import java.util.List;
 
-@FeignClient(name = "user-service", path = "/users")
+@FeignClient(name = "user-service", path = "/admin/users")
 public interface UserServiceClient {
     @GetMapping("/client/{userId}")
     UserShortDto getUserShortDtoClientById(@PathVariable Long userId);
 
     @GetMapping("/client/exist/{userId}")
     void validateUserExistingById(@PathVariable Long userId);
-
-    @GetMapping
-    List<UserShortDto> getUsersByIds(@RequestParam("ids") List<Long> userIds);
 }
