@@ -19,6 +19,7 @@ public interface ParticipationRequestServiceClient {
 
     @GetMapping("/client/count")
     Map<Long, List<ParticipationRequestDto>> getConfirmedRequestsCount(
+            @PathVariable @Positive Long userId,
             @RequestParam List<Long> eventIds,
             @RequestParam RequestStatus requestStatus);
 

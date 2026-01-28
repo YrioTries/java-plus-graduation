@@ -55,9 +55,10 @@ public class PrivateRequestController {
 
     @GetMapping("/client/count")
     public Map<Long, List<ParticipationRequestDto>> getConfirmedRequestsCount(
+            @PathVariable @Positive Long userId,
             @RequestParam List<Long> eventIds,
             @RequestParam RequestStatus requestStatus) {
-        return participationRequestService.getConfirmedRequestsCount(eventIds, requestStatus);
+        return participationRequestService.getConfirmedRequestsCount(userId, eventIds, requestStatus);
     }
 
     @GetMapping("/client/event/{eventId}")

@@ -72,6 +72,7 @@ public class EventServiceImpl implements EventService {
         Map<Long, Long> views = getEventsViews(events);
 
         Map<Long, List<ParticipationRequestDto>> confRequests = requestServiceClient.getConfirmedRequestsCount(
+                1L,
                 events.stream().map(Event::getId).toList(),
                 RequestStatus.CONFIRMED
         );
