@@ -111,10 +111,6 @@ public class PublicEventServiceImpl implements PublicEventService {
 
         CategoryDto categoryDto = categoryServiceClient.getCategoryById(event.getCategoryId());
 
-        if (event.getState() != EventState.PUBLISHED) {
-            throw new NotFoundException("Event not found");
-        }
-
         return eventMapper.toEventShortDtoWithDetails(event, categoryDto, userShortDto);
     }
 
@@ -139,10 +135,6 @@ public class PublicEventServiceImpl implements PublicEventService {
         UserShortDto userShortDto = userServiceClient.getUserShortDtoClientById(event.getInitiatorId());
 
         CategoryDto categoryDto = categoryServiceClient.getCategoryById(event.getCategoryId());
-
-        if (event.getState() != EventState.PUBLISHED) {
-            throw new NotFoundException("Event not found");
-        }
 
         return eventMapper.toEventFullDtoWithDetails(
                 event,
