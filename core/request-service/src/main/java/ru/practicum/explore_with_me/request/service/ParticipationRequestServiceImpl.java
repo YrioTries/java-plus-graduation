@@ -56,47 +56,6 @@ public class ParticipationRequestServiceImpl implements RequestService {
     }
 
     @Override
-    @Transactional
-    public EventRequestStatusUpdateResult updateRequestStatus(Long userId, Long eventId,
-                                                              EventRequestStatusUpdateRequest updateRequest) {
-        log.debug("Запрос на получение event клиентом из updateRequestStatus сервиса {}", serviceName);
-        EventFullDto event = eventServiceClient.getEventFullDtoByIdClient(eventId);
-
-        if (!event.getInitiator().getId().equals(userId)) {
-            throw new NotFoundException("Event with id=" + eventId + " not found for user with id=" + userId);
-        }
-
-        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
-            throw new ConflictException("Event does not require request moderation");
-        }
-
-        List<Long> requestIds = new ArrayList<>(updateRequest.getRequestIds());
-        if (requestIds.isEmpty()) {
-            return new EventRequestStatusUpdateResult(List.of(), List.of());
-        }
-
-        Map<Long, ParticipationRequest> requestsMap = participationRequestRepository.findByIdIn(requestIds)
-                .stream()
-                .collect(Collectors.toMap(ParticipationRequest::getId, Function.identity()));
-
-        validateAllRequestsFound(requestIds, requestsMap);
-
-        validateRequestsMap(requestsMap, eventId);
-
-        List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
-        List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
-
-        RequestStatus status = updateRequest.getStatus();
-        if (status == RequestStatus.CONFIRMED) {
-            processConfirmationWithMap(event, requestsMap, requestIds, confirmedRequests, rejectedRequests);
-        } else if (status == RequestStatus.REJECTED) {
-            processRejectionWithMap(requestsMap, requestIds, rejectedRequests);
-        }
-
-        return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
-    }
-
-    @Override
     public List<ParticipationRequestDto> getUserRequests(Long userId) {
         log.debug("UserServiceClient validateUserExistingById received request getUserRequests from {}", serviceName);
         userServiceClient.validateUserExistingById(userId);
@@ -157,6 +116,47 @@ public class ParticipationRequestServiceImpl implements RequestService {
 
         ParticipationRequest savedRequest = participationRequestRepository.save(request);
         return participationRequestMapper.toParticipationRequestDto(savedRequest);
+    }
+
+    @Override
+    @Transactional
+    public EventRequestStatusUpdateResult updateRequestStatus(Long userId, Long eventId,
+                                                              EventRequestStatusUpdateRequest updateRequest) {
+        log.debug("Запрос на получение event клиентом из updateRequestStatus сервиса {}", serviceName);
+        EventFullDto event = eventServiceClient.getEventFullDtoByIdClient(eventId);
+
+        if (!event.getInitiator().getId().equals(userId)) {
+            throw new NotFoundException("Event with id=" + eventId + " not found for user with id=" + userId);
+        }
+
+        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
+            throw new ConflictException("Event does not require request moderation");
+        }
+
+        List<Long> requestIds = new ArrayList<>(updateRequest.getRequestIds());
+        if (requestIds.isEmpty()) {
+            return new EventRequestStatusUpdateResult(List.of(), List.of());
+        }
+
+        Map<Long, ParticipationRequest> requestsMap = participationRequestRepository.findByIdIn(requestIds)
+                .stream()
+                .collect(Collectors.toMap(ParticipationRequest::getId, Function.identity()));
+
+        validateAllRequestsFound(requestIds, requestsMap);
+
+        validateRequestsMap(requestsMap, eventId);
+
+        List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
+        List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
+
+        RequestStatus status = updateRequest.getStatus();
+        if (status == RequestStatus.CONFIRMED) {
+            processConfirmationWithMap(event, requestsMap, requestIds, confirmedRequests, rejectedRequests);
+        } else if (status == RequestStatus.REJECTED) {
+            processRejectionWithMap(requestsMap, requestIds, rejectedRequests);
+        }
+
+        return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
     }
 
     @Override
