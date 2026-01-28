@@ -28,13 +28,6 @@ public class PrivateRequestController {
         return participationRequestService.getEventRequests(userId, eventId);
     }
 
-    @PatchMapping("/{userId}/events/{eventId}/requests")
-    public EventRequestStatusUpdateResult updateRequestStatus(@PathVariable @Positive Long userId,
-                                                              @PathVariable @Positive Long eventId,
-                                                              @RequestBody @Valid EventRequestStatusUpdateRequest updateRequest) {
-        return participationRequestService.updateRequestStatus(userId, eventId, updateRequest);
-    }
-
     @GetMapping("/{userId}/requests")
     public List<ParticipationRequestDto> getUserRequests(@PathVariable @Positive Long userId) {
         return participationRequestService.getUserRequests(userId);
@@ -45,6 +38,14 @@ public class PrivateRequestController {
     public ParticipationRequestDto createRequest(@PathVariable @Positive Long userId,
                                                  @RequestParam @Positive Long eventId) {
         return participationRequestService.createRequest(userId, eventId);
+    }
+
+
+    @PatchMapping("/{userId}/events/{eventId}/requests")
+    public EventRequestStatusUpdateResult updateRequestStatus(@PathVariable @Positive Long userId,
+                                                              @PathVariable @Positive Long eventId,
+                                                              @RequestBody @Valid EventRequestStatusUpdateRequest updateRequest) {
+        return participationRequestService.updateRequestStatus(userId, eventId, updateRequest);
     }
 
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
