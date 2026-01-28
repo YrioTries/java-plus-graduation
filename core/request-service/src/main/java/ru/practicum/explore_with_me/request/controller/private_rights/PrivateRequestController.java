@@ -40,7 +40,6 @@ public class PrivateRequestController {
         return participationRequestService.createRequest(userId, eventId);
     }
 
-
     @PatchMapping("/{userId}/events/{eventId}/requests")
     public EventRequestStatusUpdateResult updateRequestStatus(@PathVariable @Positive Long userId,
                                                               @PathVariable @Positive Long eventId,

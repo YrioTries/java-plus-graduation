@@ -53,17 +53,17 @@ spring:
             - RewritePath=/admin/users/(?<segment>.*), /admin/users/$\{segment}
 
         # Маршруты для Private контроллеров
+        - id: private-requests-route
+          uri: lb://request-service
+          predicates:
+            - Path=/users/{userId}/requests/**, /users/{userId}/events/{eventId}/requests
+          filters:
+            - RewritePath=/users/(?<userId>\d+)/(?<segment>.*), /users/$\{userId}/$\{segment}
+
         - id: private-events-route
           uri: lb://event-service
           predicates:
             - Path=/users/{userId}/events/**
-
-        - id: private-requests-route
-          uri: lb://request-service
-          predicates:
-            - Path=/users/{userId}/requests/**
-          filters:
-            - RewritePath=/users/(?<userId>\\d+)/requests/(?<segment>.*), /users/$\{userId}/requests/$\{segment}
 
         - id: private-reviews-route
           uri: lb://review-service
