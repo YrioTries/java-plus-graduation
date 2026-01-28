@@ -62,8 +62,8 @@ public class PublicEventController {
     }
 
     @GetMapping("/client/validate/category/{categoryId}")
-    public void validateCategoryForEventExisting(@PathVariable @Positive Long categoryId) {
-        publicEventService.validateCategoryForEventExisting(categoryId);
+    public void validateCategoryHasNoEvents(@PathVariable @Positive Long categoryId) {
+        publicEventService.validateCategoryHasNoEvents(categoryId);
     }
 
     @GetMapping("/client/find/all")

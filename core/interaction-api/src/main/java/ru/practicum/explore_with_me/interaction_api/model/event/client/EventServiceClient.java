@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventFullDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDto;
 
-import java.util.List;
 import java.util.Set;
 
 @FeignClient(
@@ -30,7 +29,7 @@ public interface EventServiceClient {
     void validateEventExistingById(@PathVariable @Positive Long eventId);
 
     @GetMapping("/client/validate/category/{categoryId}")
-    void validateCategoryForEventExisting(
+    void validateCategoryHasNoEvents(
             @PathVariable @Positive Long categoryId);
 
     @GetMapping("/client/find/all")

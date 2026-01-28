@@ -89,9 +89,9 @@ public class PublicEventServiceImpl implements PublicEventService {
     }
 
     @Override
-    public void validateCategoryForEventExisting(Long categoryId) {
-        if (!eventRepository.findByCategoryId(categoryId).isEmpty()) {
-            throw new ConflictException("Category has associated events");
+    public void validateCategoryHasNoEvents(Long categoryId) {
+        if (eventRepository.existsByCategoryId(categoryId)) {
+            throw new ConflictException("Category has associated events and cannot be deleted");
         }
     }
 

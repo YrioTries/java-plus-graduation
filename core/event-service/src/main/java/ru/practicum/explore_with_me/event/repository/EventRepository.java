@@ -24,6 +24,10 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
 
     List<Event> findByCategoryId(Long categoryId);
 
+    boolean existsByCategoryId(Long categoryId);
+
+    long countByCategoryId(Long categoryId);
+
     @Query("SELECT e FROM Event e WHERE " +
             "(:users IS NULL OR e.initiatorId IN :users) AND " +
             "(:states IS NULL OR e.state IN :states) AND " +

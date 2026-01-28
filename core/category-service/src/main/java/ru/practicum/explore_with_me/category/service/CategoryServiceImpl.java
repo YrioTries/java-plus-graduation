@@ -1,7 +1,6 @@
 package ru.practicum.explore_with_me.category.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -38,6 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category category = categoryMapper.toCategoryFromNew(newCategoryDto);
         Category savedCategory = categoryRepository.save(category);
+
         return categoryMapper.toCategoryDto(savedCategory);
     }
 
@@ -48,7 +48,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new NotFoundException("Category not found"));
 
         log.debug("Запрос на получение event клиентом из deleteCategory сервиса {}", serviceName);
-        eventServiceClient.validateCategoryForEventExisting(catId);
+        eventServiceClient.validateCategoryHasNoEvents(catId);
 
         categoryRepository.delete(category);
     }

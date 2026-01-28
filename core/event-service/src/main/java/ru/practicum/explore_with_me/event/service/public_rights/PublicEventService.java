@@ -29,5 +29,5 @@ public interface PublicEventService {
 
     void validateEventExistingById(Long eventId);
 
-    void validateCategoryForEventExisting(Long categoryId);
+    void validateCategoryHasNoEvents(Long categoryId);
 }
