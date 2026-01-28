@@ -1,9 +1,7 @@
 package ru.practicum.explore_with_me.event.mapper;
 
-import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import ru.practicum.explore_with_me.event.dao.Event;
 import ru.practicum.explore_with_me.event.dao.Location;
 import ru.practicum.explore_with_me.interaction_api.model.category.dto.CategoryDto;
@@ -28,11 +26,7 @@ public interface EventMapper {
 
     @Mapping(target = "category.id", source = "categoryId")
     @Mapping(target = "initiator.id", source = "initiatorId")
-    EventFullDto toEventFullDto(Event event);
-
-    @Mapping(target = "category.id", source = "categoryId")
-    @Mapping(target = "initiator.id", source = "initiatorId")
-    EventShortDto toEventShortDto(Event event);
+    EventShortDto toEventShortDtoв(Event event);
 
     default Location toLocation(LocationDto dto) {
         if (dto == null) {
@@ -54,48 +48,39 @@ public interface EventMapper {
         return locationDto;
     }
 
-    @AfterMapping
-    default void setDefaultValues(@MappingTarget Event event, NewEventDto newEventDto) {
-        if (newEventDto.getPaid() == null) {
-            event.setPaid(false);
-        }
-        if (newEventDto.getParticipantLimit() == null) {
-            event.setParticipantLimit(0);
-        }
-        if (newEventDto.getRequestModeration() == null) {
-            event.setRequestModeration(true);
-        }
-    }
-
-    default EventFullDto toEventFullDtoWithDetails(
+    default EventFullDto toEventFullDto(
             Event event,
             CategoryDto categoryDto,
             UserShortDto userShortDto
     ) {
-        EventFullDto dto = toEventFullDto(event);
-        if (event.getCategoryId() != null) {
-            dto.setCategory(categoryDto);
-        }
-        if (event.getInitiatorId() != null) {
-            dto.setInitiator(userShortDto);
-        }
+        EventFullDto dto = new EventFullDto();
+        dto.setId(event.getId());
+        dto.setAnnotation(event.getAnnotation());
+        dto.setDescription(event.getDescription());
+        dto.setEventDate(event.getEventDate());
+        dto.setCreatedOn(event.getCreatedOn());
+        dto.setPublishedOn(event.getPublishedOn());
+        dto.setPaid(event.getPaid());
+        dto.setParticipantLimit(event.getParticipantLimit());
+        dto.setRequestModeration(event.getRequestModeration());
+        dto.setTitle(event.getTitle());
+
+        dto.setState(event.getState() != null ? event.getState().toString() : null);
+
+        dto.setCategory(categoryDto);
+        dto.setInitiator(userShortDto);
+
         if (event.getLocation() != null) {
             dto.setLocation(toLocationDto(event.getLocation()));
         }
-        if (event.getState() != null) {
-            dto.setState(event.getState().toString());
-        }
+
         return dto;
     }
 
-    default EventShortDto toEventShortDtoWithDetails(Event event, CategoryDto categoryDto, UserShortDto userShortDto) {
-        EventShortDto dto = toEventShortDto(event);
-        if (event.getCategoryId() != null) {
-            dto.setCategory(categoryDto);
-        }
-        if (event.getInitiatorId() != null) {
-            dto.setInitiator(userShortDto);
-        }
+    default EventShortDto toEventShortDto(Event event, CategoryDto categoryDto, UserShortDto userShortDto) {
+        EventShortDto dto = new EventShortDto();
+        dto.setCategory(categoryDto);
+        dto.setInitiator(userShortDto);
         return dto;
     }
 }

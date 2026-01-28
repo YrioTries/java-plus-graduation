@@ -45,10 +45,11 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         return events.stream()
                 .map(event -> {
-                    EventShortDto dto = eventMapper.toEventShortDto(event);
-                    dto.setInitiator(userServiceClient.getUserShortDtoClientById(event.getInitiatorId()));
-                    dto.setCategory(categoryServiceClient.getCategoryById(event.getCategoryId()));
-                    return dto;
+                    return eventMapper.toEventShortDto(
+                            event,
+                            categoryServiceClient.getCategoryById(event.getCategoryId()),
+                            userServiceClient.getUserShortDtoClientById(event.getInitiatorId())
+                    );
                 })
                 .toList();
     }
@@ -64,7 +65,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         CategoryDto categoryDto = categoryServiceClient.getCategoryById(event.getCategoryId());
 
-        return eventMapper.toEventFullDtoWithDetails(
+        return eventMapper.toEventFullDto(
                 event,
                 categoryDto,
                 userShortDto
@@ -98,7 +99,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         Event savedEvent = eventRepository.save(event);
 
-        return eventMapper.toEventFullDtoWithDetails(
+        return eventMapper.toEventFullDto(
                 savedEvent,
                 categoryDto,
                 userShortDto
@@ -137,7 +138,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         updateEventFields(event, updateRequest);
         Event updatedEvent = eventRepository.save(event);
 
-        return eventMapper.toEventFullDtoWithDetails(
+        return eventMapper.toEventFullDto(
                 updatedEvent,
                 categoryDto,
                 userShortDto

@@ -79,10 +79,10 @@ public class PublicEventServiceImpl implements PublicEventService {
         return results
                 .stream()
                 .map(event -> {
-                    EventShortDto dto = eventMapper.toEventShortDto(event);
-                    dto.setInitiator(userServiceClient.getUserShortDtoClientById(event.getInitiatorId()));
-                    dto.setCategory(categoryServiceClient.getCategoryById(event.getCategoryId()));
-                    return dto;
+                    return eventMapper.toEventShortDto(
+                            event,
+                            categoryServiceClient.getCategoryById(event.getCategoryId()),
+                            userServiceClient.getUserShortDtoClientById(event.getInitiatorId()));
                 })
                 .peek(dto -> dto.setViews(views.getOrDefault(dto.getId(), 0L)))
                 .toList();
@@ -111,7 +111,7 @@ public class PublicEventServiceImpl implements PublicEventService {
 
         CategoryDto categoryDto = categoryServiceClient.getCategoryById(event.getCategoryId());
 
-        return eventMapper.toEventShortDtoWithDetails(event, categoryDto, userShortDto);
+        return eventMapper.toEventShortDto(event, categoryDto, userShortDto);
     }
 
     @Override
@@ -119,10 +119,10 @@ public class PublicEventServiceImpl implements PublicEventService {
         return eventRepository.findAllByIdIn(eventIds)
                 .stream()
                 .map(event -> {
-                    EventShortDto dto = eventMapper.toEventShortDto(event);
-                    dto.setInitiator(userServiceClient.getUserShortDtoClientById(event.getInitiatorId()));
-                    dto.setCategory(categoryServiceClient.getCategoryById(event.getCategoryId()));
-                    return dto;
+                    return eventMapper.toEventShortDto(
+                            event,
+                            categoryServiceClient.getCategoryById(event.getCategoryId()),
+                            userServiceClient.getUserShortDtoClientById(event.getInitiatorId()));
                 })
                 .collect(Collectors.toSet());
     }
@@ -136,7 +136,7 @@ public class PublicEventServiceImpl implements PublicEventService {
 
         CategoryDto categoryDto = categoryServiceClient.getCategoryById(event.getCategoryId());
 
-        return eventMapper.toEventFullDtoWithDetails(
+        return eventMapper.toEventFullDto(
                 event,
                 categoryDto,
                 userShortDto
@@ -165,7 +165,7 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .timestamp(LocalDateTime.now())
                 .build());
 
-        EventFullDto eventDto = eventMapper.toEventFullDtoWithDetails(
+        EventFullDto eventDto = eventMapper.toEventFullDto(
                 event,
                 categoryDto,
                 userShortDto

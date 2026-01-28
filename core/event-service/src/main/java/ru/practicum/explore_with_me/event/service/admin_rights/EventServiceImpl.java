@@ -79,7 +79,7 @@ public class EventServiceImpl implements EventService {
                 .map(event -> {
                     log.debug("Call getUserShortDtoClientById of user-service client from EventServiceImpl");
 
-                    return eventMapper.toEventFullDtoWithDetails(
+                    return eventMapper.toEventFullDto(
                             event,
                             categoryServiceClient.getCategoryById(event.getCategoryId()),
                             userServiceClient.getUserShortDtoClientById(event.getInitiatorId())
@@ -121,7 +121,7 @@ public class EventServiceImpl implements EventService {
         updateEventFields(event, updateRequest);
         Event updatedEvent = eventRepository.save(event);
 
-        return eventMapper.toEventFullDtoWithDetails(
+        return eventMapper.toEventFullDto(
                 updatedEvent,
                 categoryDto,
                 userShortDto
