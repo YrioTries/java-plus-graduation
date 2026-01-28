@@ -32,6 +32,26 @@ public class CompilationServiceImpl implements CompilationService {
     private final EventServiceClient eventServiceClient;
 
     @Override
+    public List<CompilationDto> getCompilations(Boolean pinned, Pageable pageable) {
+        if (pinned != null) {
+            return compilationRepository.findByPinned(pinned, pageable)
+                    .map(compilationMapper::toCompilationDto)
+                    .getContent();
+        } else {
+            return compilationRepository.findAll(pageable)
+                    .map(compilationMapper::toCompilationDto)
+                    .getContent();
+        }
+    }
+
+    @Override
+    public CompilationDto getCompilationById(Long compId) {
+        Compilation compilation = compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Compilation not found"));
+        return compilationMapper.toCompilationDto(compilation);
+    }
+
+    @Override
     @Transactional
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
         Compilation compilation = compilationMapper.toCompilation(newCompilationDto);
@@ -89,25 +109,5 @@ public class CompilationServiceImpl implements CompilationService {
         CompilationDto compilationDto = compilationMapper.toCompilationDto(updatedCompilation);
         compilationDto.setEvents(eventServiceClient.getEventShortDtoSetByIds(updatedCompilation.getEventsId()));
         return compilationDto;
-    }
-
-    @Override
-    public List<CompilationDto> getCompilations(Boolean pinned, Pageable pageable) {
-        if (pinned != null) {
-            return compilationRepository.findByPinned(pinned, pageable)
-                    .map(compilationMapper::toCompilationDto)
-                    .getContent();
-        } else {
-            return compilationRepository.findAll(pageable)
-                    .map(compilationMapper::toCompilationDto)
-                    .getContent();
-        }
-    }
-
-    @Override
-    public CompilationDto getCompilationById(Long compId) {
-        Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Compilation not found"));
-        return compilationMapper.toCompilationDto(compilation);
     }
 }
