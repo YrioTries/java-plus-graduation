@@ -16,9 +16,13 @@ import ru.practicum.explore_with_me.event.repository.EventRepository;
 import ru.practicum.explore_with_me.interaction_api.exception.BadRequestException;
 import ru.practicum.explore_with_me.interaction_api.exception.ConflictException;
 import ru.practicum.explore_with_me.interaction_api.exception.NotFoundException;
+import ru.practicum.explore_with_me.interaction_api.model.category.client.CategoryServiceClient;
+import ru.practicum.explore_with_me.interaction_api.model.category.dto.CategoryDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventFullDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.EventState;
+import ru.practicum.explore_with_me.interaction_api.model.user.client.UserServiceClient;
+import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -31,6 +35,9 @@ import java.util.stream.Collectors;
 public class PublicEventServiceImpl implements PublicEventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
+
+    UserServiceClient userServiceClient;
+    CategoryServiceClient categoryServiceClient;
 
     private final StatsClient statsClient;
 
@@ -71,7 +78,12 @@ public class PublicEventServiceImpl implements PublicEventService {
 
         return results
                 .stream()
-                .map(eventMapper::toEventShortDto)
+                .map(event -> {
+                    EventShortDto dto = eventMapper.toEventShortDto(event);
+                    dto.setInitiator(userServiceClient.getUserShortDtoClientById(event.getInitiatorId()));
+                    dto.setCategory(categoryServiceClient.getCategoryById(event.getCategoryId()));
+                    return dto;
+                })
                 .peek(dto -> dto.setViews(views.getOrDefault(dto.getId(), 0L)))
                 .toList();
     }
@@ -95,18 +107,27 @@ public class PublicEventServiceImpl implements PublicEventService {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Event with the same id not found"));
 
+        UserShortDto userShortDto = userServiceClient.getUserShortDtoClientById(event.getInitiatorId());
+
+        CategoryDto categoryDto = categoryServiceClient.getCategoryById(event.getCategoryId());
+
         if (event.getState() != EventState.PUBLISHED) {
             throw new NotFoundException("Event not found");
         }
 
-        return eventMapper.toEventShortDto(event);
+        return eventMapper.toEventShortDtoWithDetails(event, categoryDto, userShortDto);
     }
 
     @Override
     public Set<EventShortDto> getEventShortDtoSetByIds(Set<Long> eventIds) {
         return eventRepository.findAllByIdIn(eventIds)
                 .stream()
-                .map(eventMapper::toEventShortDto)
+                .map(event -> {
+                    EventShortDto dto = eventMapper.toEventShortDto(event);
+                    dto.setInitiator(userServiceClient.getUserShortDtoClientById(event.getInitiatorId()));
+                    dto.setCategory(categoryServiceClient.getCategoryById(event.getCategoryId()));
+                    return dto;
+                })
                 .collect(Collectors.toSet());
     }
 
@@ -115,11 +136,19 @@ public class PublicEventServiceImpl implements PublicEventService {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Event with the same id not found"));
 
+        UserShortDto userShortDto = userServiceClient.getUserShortDtoClientById(event.getInitiatorId());
+
+        CategoryDto categoryDto = categoryServiceClient.getCategoryById(event.getCategoryId());
+
         if (event.getState() != EventState.PUBLISHED) {
             throw new NotFoundException("Event not found");
         }
 
-        return eventMapper.toEventFullDto(event);
+        return eventMapper.toEventFullDtoWithDetails(
+                event,
+                categoryDto,
+                userShortDto,
+                eventMapper.toLocationDto(event.getLocation()));
     }
 
     @Override
@@ -127,6 +156,10 @@ public class PublicEventServiceImpl implements PublicEventService {
     public EventFullDto getEventById(Long id, HttpServletRequest request) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
+
+        UserShortDto userShortDto = userServiceClient.getUserShortDtoClientById(event.getInitiatorId());
+
+        CategoryDto categoryDto = categoryServiceClient.getCategoryById(event.getCategoryId());
 
         if (event.getState() != EventState.PUBLISHED) {
             throw new NotFoundException("Event not found");
@@ -140,7 +173,11 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .timestamp(LocalDateTime.now())
                 .build());
 
-        EventFullDto eventDto = eventMapper.toEventFullDto(event);
+        EventFullDto eventDto = eventMapper.toEventFullDtoWithDetails(
+                event,
+                categoryDto,
+                userShortDto,
+                eventMapper.toLocationDto(event.getLocation()));
 
         Map<Long, Long> views = getEventsViews(List.of(event));
         eventDto.setViews(views.getOrDefault(id, 0L));
