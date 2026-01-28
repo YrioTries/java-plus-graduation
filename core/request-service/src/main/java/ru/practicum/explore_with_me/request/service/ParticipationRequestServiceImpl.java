@@ -133,7 +133,7 @@ public class ParticipationRequestServiceImpl implements RequestService {
             throw new ConflictException("Initiator cannot request participation in their own event");
         }
 
-        if (event.getState().equals(EventState.PUBLISHED.toString())) {
+        if (!EventState.PUBLISHED.toString().equals(event.getState())) {
             throw new ConflictException("Cannot participate in unpublished event");
         }
 
