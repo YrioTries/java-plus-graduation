@@ -184,7 +184,7 @@ public class ParticipationRequestServiceImpl implements RequestService {
             List<Long> eventIds,
             RequestStatus requestStatus) {
         List<ParticipationRequest> requests = participationRequestRepository.findAllByEventIdInAndStatus(eventIds, requestStatus);
-        return requests.stream().map(participationRequestMapper::toParticipationRequestDto).collect(Collectors.groupingBy(ParticipationRequestDto::getEventId));
+        return requests.stream().map(participationRequestMapper::toParticipationRequestDto).collect(Collectors.groupingBy(ParticipationRequestDto::getEvent));
     }
 
     private void validateAllRequestsFound(List<Long> requestIds, Map<Long, ParticipationRequest> requestsMap) {
