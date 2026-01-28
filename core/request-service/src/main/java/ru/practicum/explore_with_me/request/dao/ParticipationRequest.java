@@ -20,12 +20,16 @@ public class ParticipationRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "request_id")
     Long id;
+
     @Builder.Default
     LocalDateTime created = LocalDateTime.now();
+
     @Column(name = "event_id")
     Long eventId;
+
     @Column(name = "requester_id")
     Long requesterId;
+
     @Enumerated(value = EnumType.STRING)
     RequestStatus status;
 }
