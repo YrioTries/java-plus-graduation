@@ -20,7 +20,7 @@ public interface RequestService {
 
     ParticipationRequestDto cancelRequest(Long userId, Long requestId);
 
-    Map<Long, List<ParticipationRequestDto>> getConfirmedRequestsCount(Long userId, List<Long> eventIds, RequestStatus requestStatus);
+    Map<Long, List<ParticipationRequestDto>> getConfirmedRequestsCount(List<Long> eventIds, RequestStatus requestStatus);
 
     ParticipationRequestDto getUserRequestByUserIdAndEventId(Long userId, Long eventId);
 }

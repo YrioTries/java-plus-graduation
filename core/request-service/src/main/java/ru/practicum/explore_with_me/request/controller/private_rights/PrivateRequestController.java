@@ -17,37 +17,37 @@ import java.util.Map;
 
 @Validated
 @RestController
-@RequestMapping("/users/{userId}")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class PrivateRequestController {
     private final RequestService participationRequestService;
 
-    @GetMapping("/events/{eventId}/requests")
+    @GetMapping("/{userId}/events/{eventId}/requests")
     public List<ParticipationRequestDto> getEventRequests(@PathVariable @Positive Long userId,
                                                           @PathVariable @Positive Long eventId) {
         return participationRequestService.getEventRequests(userId, eventId);
     }
 
-    @PatchMapping("/events/{eventId}/requests")
+    @PatchMapping("/{userId}/events/{eventId}/requests")
     public EventRequestStatusUpdateResult updateRequestStatus(@PathVariable @Positive Long userId,
                                                               @PathVariable @Positive Long eventId,
                                                               @RequestBody @Valid EventRequestStatusUpdateRequest updateRequest) {
         return participationRequestService.updateRequestStatus(userId, eventId, updateRequest);
     }
 
-    @GetMapping("/requests")
+    @GetMapping("/{userId}/requests")
     public List<ParticipationRequestDto> getUserRequests(@PathVariable @Positive Long userId) {
         return participationRequestService.getUserRequests(userId);
     }
 
-    @PostMapping("/requests")
+    @PostMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto createRequest(@PathVariable @Positive Long userId,
                                                  @RequestParam @Positive Long eventId) {
         return participationRequestService.createRequest(userId, eventId);
     }
 
-    @PatchMapping("/requests/{requestId}/cancel")
+    @PatchMapping("/{userId}/requests/{requestId}/cancel")
     public ParticipationRequestDto cancelRequest(@PathVariable @Positive Long userId,
                                                  @PathVariable @Positive Long requestId) {
         return participationRequestService.cancelRequest(userId, requestId);
@@ -55,13 +55,12 @@ public class PrivateRequestController {
 
     @GetMapping("/client/count")
     public Map<Long, List<ParticipationRequestDto>> getConfirmedRequestsCount(
-            @PathVariable @Positive Long userId,
             @RequestParam List<Long> eventIds,
             @RequestParam RequestStatus requestStatus) {
-        return participationRequestService.getConfirmedRequestsCount(userId, eventIds, requestStatus);
+        return participationRequestService.getConfirmedRequestsCount(eventIds, requestStatus);
     }
 
-    @GetMapping("/client/event/{eventId}")
+    @GetMapping("/{userId}/client/event/{eventId}")
     public ParticipationRequestDto getUserRequestByUserIdAndEventId(
             @PathVariable @Positive Long userId,
             @PathVariable @Positive Long eventId) {

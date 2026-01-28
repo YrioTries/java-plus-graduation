@@ -181,7 +181,6 @@ public class ParticipationRequestServiceImpl implements RequestService {
 
     @Override
     public Map<Long, List<ParticipationRequestDto>> getConfirmedRequestsCount(
-            Long userId,
             List<Long> eventIds,
             RequestStatus requestStatus) {
         List<ParticipationRequest> requests = participationRequestRepository.findAllByEventIdInAndStatus(eventIds, requestStatus);

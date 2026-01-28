@@ -13,18 +13,17 @@ import java.util.Map;
 
 @FeignClient(
         name = "request-service",
-        path = "/users/{userId}"
+        path = "/users"
 )
 public interface ParticipationRequestServiceClient {
 
     @GetMapping("/client/count")
     Map<Long, List<ParticipationRequestDto>> getConfirmedRequestsCount(
-            @PathVariable @Positive Long userId,
-            @RequestParam List<Long> eventIds,
-            @RequestParam RequestStatus requestStatus);
+            @RequestParam("eventIds") List<Long> eventIds,
+            @RequestParam("requestStatus") RequestStatus requestStatus);
 
-    @GetMapping("/client/event/{eventId}")
+    @GetMapping("/{userId}/client/event/{eventId}")
     ParticipationRequestDto getUserRequestByUserIdAndEventId(
-            @PathVariable @Positive Long userId,
-            @PathVariable @Positive Long eventId);
+            @PathVariable("userId") @Positive Long userId,
+            @PathVariable("eventId") @Positive Long eventId);
 }
