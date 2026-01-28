@@ -40,24 +40,35 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
     @Override
     public List<EventShortDto> getEventsByUser(Long userId, Pageable pageable) {
-        log.debug("UserServiceClient validateUserExistingById received request from {}", serviceName);
 
-        userServiceClient.validateUserExistingById(userId);
+        List<Event> events = eventRepository.findByInitiatorId(userId, pageable).getContent();
 
-        return eventRepository.findByInitiatorId(userId, pageable)
-                .map(eventMapper::toEventShortDto)
-                .getContent();
+        return events.stream()
+                .map(event -> {
+                    EventShortDto dto = eventMapper.toEventShortDto(event);
+                    dto.setInitiator(userServiceClient.getUserShortDtoClientById(event.getInitiatorId()));
+                    dto.setCategory(categoryServiceClient.getCategoryById(event.getCategoryId()));
+                    return dto;
+                })
+                .toList();
     }
 
     @Override
     public EventFullDto getEventByUser(Long userId, Long eventId) {
-        log.debug("UserServiceClient validateUserExistingById received request getEventByUser from {}", serviceName);
-
-        userServiceClient.validateUserExistingById(userId);
+        log.debug("UserServiceClient getUserShortDtoClientById received request getEventByUser from {}", serviceName);
 
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
-        return eventMapper.toEventFullDto(event);
+
+        UserShortDto userShortDto = userServiceClient.getUserShortDtoClientById(userId);
+
+        CategoryDto categoryDto = categoryServiceClient.getCategoryById(event.getCategoryId());
+
+        EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
+        eventFullDto.setInitiator(userShortDto);
+        eventFullDto.setCategory(categoryDto);
+        eventFullDto.setLocation(eventMapper.toLocationDto(event.getLocation()));
+        return eventFullDto;
     }
 
     @Override

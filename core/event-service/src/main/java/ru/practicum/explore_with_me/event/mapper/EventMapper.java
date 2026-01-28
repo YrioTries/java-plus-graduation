@@ -44,6 +44,16 @@ public interface EventMapper {
         return location;
     }
 
+    default LocationDto toLocationDto(Location location) {
+        if (location == null) {
+            return null;
+        }
+        LocationDto locationDto = new LocationDto();
+        locationDto.setLat(location.getLat());
+        locationDto.setLon(location.getLon());
+        return locationDto;
+    }
+
     @AfterMapping
     default void setDefaultValues(@MappingTarget Event event, NewEventDto newEventDto) {
         if (newEventDto.getPaid() == null) {
