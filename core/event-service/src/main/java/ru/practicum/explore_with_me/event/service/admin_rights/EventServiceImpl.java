@@ -96,7 +96,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
 
-        UserShortDto userShortDto = userServiceClient.getUserShortDtoClientById(event.getId());
+        UserShortDto userShortDto = userServiceClient.getUserShortDtoClientById(event.getInitiatorId());
 
         CategoryDto categoryDto = categoryServiceClient.getCategoryById(event.getCategoryId());
 
