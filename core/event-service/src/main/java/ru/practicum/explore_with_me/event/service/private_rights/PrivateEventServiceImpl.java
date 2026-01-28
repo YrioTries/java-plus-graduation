@@ -76,7 +76,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         log.debug("Call getUserShortDtoClientById of user-service client from {}", serviceName);
         UserShortDto userShortDto = userServiceClient.getUserShortDtoClientById(userId);
-        //Уже с валидацией
+
         CategoryDto categoryDto = categoryServiceClient.getCategoryById(newEventDto.getCategory());
 
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
