@@ -36,51 +36,18 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
         Compilation compilation = compilationMapper.toCompilation(newCompilationDto);
 
-        Set<EventShortDto> foundEvents = new HashSet<>();
-        Set<Long> eventIdsToSave = new HashSet<>();
-
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
-            try {
-                foundEvents = eventServiceClient.getEventShortDtoSetByIds(newCompilationDto.getEvents());
-
-                eventIdsToSave = foundEvents.stream()
-                        .map(EventShortDto::getId)
-                        .collect(Collectors.toSet());
-
-                if (eventIdsToSave.size() != newCompilationDto.getEvents().size()) {
-                    Set<Long> missingIds = new HashSet<>(newCompilationDto.getEvents());
-                    missingIds.removeAll(eventIdsToSave);
-                    log.warn("Some events not found: {}", missingIds);
-                    throw new NotFoundException("Некоторые события не найдены: " + missingIds);
-                }
-
-            } catch (FeignException e) {
-                log.error("Error calling event-service: {}", e.getMessage());
-
-                // Уточните тип исключения
-                if (e.status() == 404) {
-                    throw new NotFoundException("События не найдены");
-                }
-                throw new RuntimeException("Error communicating with event-service");
+            Set<EventShortDto> events = eventServiceClient.getEventShortDtoSetByIds(newCompilationDto.getEvents());
+            if (events.size() != newCompilationDto.getEvents().size()) {
+                throw new NotFoundException("Некоторые события не найдены");
             }
+            compilation.setEventsId(newCompilationDto.getEvents()); // Сохраняем только ID
         }
 
-        compilation.setEventsId(eventIdsToSave);
         Compilation savedCompilation = compilationRepository.save(compilation);
 
         CompilationDto compilationDto = compilationMapper.toCompilationDto(savedCompilation);
-
-        if (!foundEvents.isEmpty()) {
-            compilationDto.setEvents(foundEvents);
-        } else if (!eventIdsToSave.isEmpty()) {
-            try {
-                Set<EventShortDto> eventDtos = eventServiceClient.getEventShortDtoSetByIds(eventIdsToSave);
-                compilationDto.setEvents(eventDtos);
-            } catch (Exception e) {
-                log.warn("Could not fetch events for response");
-                compilationDto.setEvents(Set.of());
-            }
-        }
+        compilationDto.setEvents(eventServiceClient.getEventShortDtoSetByIds(savedCompilation.getEventsId()));
 
         return compilationDto;
     }
