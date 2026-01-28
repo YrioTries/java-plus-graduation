@@ -23,6 +23,7 @@ import ru.practicum.explore_with_me.interaction_api.model.request.RequestStatus;
 import ru.practicum.explore_with_me.interaction_api.model.request.client.ParticipationRequestServiceClient;
 import ru.practicum.explore_with_me.interaction_api.model.request.dto.ParticipationRequestDto;
 import ru.practicum.explore_with_me.interaction_api.model.user.client.UserServiceClient;
+import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -81,12 +82,12 @@ public class EventServiceImpl implements EventService {
                     return eventMapper.toEventFullDtoWithDetails(
                             event,
                             categoryServiceClient.getCategoryById(event.getCategoryId()),
-                            userServiceClient.getUserShortDtoClientById(event.getInitiatorId()));
+                            userServiceClient.getUserShortDtoClientById(event.getInitiatorId()),
+                            eventMapper.toLocationDto(event.getLocation()));
                 })
                 .peek(dto -> dto.setViews(views.getOrDefault(dto.getId(), 0L)))
                 .peek(dto -> dto.setConfirmedRequests((confRequests.getOrDefault(dto.getId(), List.of())).size()))
                 .toList();
-
     }
 
     @Override
@@ -94,6 +95,10 @@ public class EventServiceImpl implements EventService {
     public EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequest updateRequest) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
+
+        UserShortDto userShortDto = userServiceClient.getUserShortDtoClientById(event.getId());
+
+        CategoryDto categoryDto = categoryServiceClient.getCategoryById(event.getCategoryId());
 
         if (updateRequest.getStateAction() != null) {
             if (updateRequest.getStateAction().equals("PUBLISH_EVENT")) {
@@ -115,7 +120,12 @@ public class EventServiceImpl implements EventService {
 
         updateEventFields(event, updateRequest);
         Event updatedEvent = eventRepository.save(event);
-        return eventMapper.toEventFullDto(updatedEvent);
+
+        EventFullDto eventFullDto = eventMapper.toEventFullDto(updatedEvent);
+        eventFullDto.setInitiator(userShortDto);
+        eventFullDto.setCategory(categoryDto);
+        eventFullDto.setLocation(eventMapper.toLocationDto(event.getLocation()));
+        return eventFullDto;
     }
 
     private void updateEventFields(Event event, UpdateEventAdminRequest updateRequest) {
