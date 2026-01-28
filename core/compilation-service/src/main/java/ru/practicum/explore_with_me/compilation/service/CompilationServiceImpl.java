@@ -55,19 +55,20 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
         Compilation compilation = compilationMapper.toCompilation(newCompilationDto);
+        Set<EventShortDto> events = new HashSet<>();
 
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
-            Set<EventShortDto> events = eventServiceClient.getEventShortDtoSetByIds(newCompilationDto.getEvents());
+            events = eventServiceClient.getEventShortDtoSetByIds(newCompilationDto.getEvents());
             if (events.size() != newCompilationDto.getEvents().size()) {
                 throw new NotFoundException("Некоторые события не найдены");
             }
-            compilation.setEventsId(newCompilationDto.getEvents()); // Сохраняем только ID
+            compilation.setEventsId(newCompilationDto.getEvents());
         }
 
         Compilation savedCompilation = compilationRepository.save(compilation);
 
         CompilationDto compilationDto = compilationMapper.toCompilationDto(savedCompilation);
-        compilationDto.setEvents(eventServiceClient.getEventShortDtoSetByIds(savedCompilation.getEventsId()));
+        compilationDto.setEvents(events);
 
         return compilationDto;
     }

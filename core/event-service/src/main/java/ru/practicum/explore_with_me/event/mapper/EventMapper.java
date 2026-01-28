@@ -1,5 +1,6 @@
 package ru.practicum.explore_with_me.event.mapper;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.explore_with_me.event.dao.Event;
@@ -10,6 +11,8 @@ import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDt
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.LocationDto;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.NewEventDto;
 import ru.practicum.explore_with_me.interaction_api.model.user.dto.UserShortDto;
+
+import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
@@ -79,8 +82,16 @@ public interface EventMapper {
 
     default EventShortDto toEventShortDto(Event event, CategoryDto categoryDto, UserShortDto userShortDto) {
         EventShortDto dto = new EventShortDto();
+        dto.setId(event.getId());
         dto.setCategory(categoryDto);
         dto.setInitiator(userShortDto);
+        dto.setAnnotation(event.getAnnotation());
+        dto.setConfirmedRequests(event.getConfirmedRequests());
+        dto.setEventDate(event.getEventDate());
+        dto.setPaid(event.getPaid());
+        dto.setTitle(event.getTitle());
+        dto.setViews(event.getViews());
+
         return dto;
     }
 }
