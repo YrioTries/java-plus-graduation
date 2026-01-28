@@ -12,6 +12,7 @@ import ru.practicum.explore_with_me.interaction_api.exception.NotFoundException;
 @Slf4j
 @RestControllerAdvice
 public class CategoryExceptionHandler {
+
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleNotFoundException(final NotFoundException e) {
