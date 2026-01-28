@@ -1,6 +1,8 @@
 package ru.practicum.explore_with_me.compilation.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +16,12 @@ import ru.practicum.explore_with_me.interaction_api.model.compilation.dto.Update
 import ru.practicum.explore_with_me.interaction_api.model.event.client.EventServiceClient;
 import ru.practicum.explore_with_me.interaction_api.model.event.dto.EventShortDto;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -31,18 +36,51 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
         Compilation compilation = compilationMapper.toCompilation(newCompilationDto);
 
+        Set<EventShortDto> foundEvents = new HashSet<>();
+        Set<Long> eventIdsToSave = new HashSet<>();
+
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
-            Set<EventShortDto> events = eventServiceClient.getEventShortDtoSetByIds(newCompilationDto.getEvents());
-            if (events.size() != newCompilationDto.getEvents().size()) {
-                throw new NotFoundException("Некоторые события не найдены");
+            try {
+                foundEvents = eventServiceClient.getEventShortDtoSetByIds(newCompilationDto.getEvents());
+
+                eventIdsToSave = foundEvents.stream()
+                        .map(EventShortDto::getId)
+                        .collect(Collectors.toSet());
+
+                if (eventIdsToSave.size() != newCompilationDto.getEvents().size()) {
+                    Set<Long> missingIds = new HashSet<>(newCompilationDto.getEvents());
+                    missingIds.removeAll(eventIdsToSave);
+                    log.warn("Some events not found: {}", missingIds);
+                    throw new NotFoundException("Некоторые события не найдены: " + missingIds);
+                }
+
+            } catch (FeignException e) {
+                log.error("Error calling event-service: {}", e.getMessage());
+
+                // Уточните тип исключения
+                if (e.status() == 404) {
+                    throw new NotFoundException("События не найдены");
+                }
+                throw new RuntimeException("Error communicating with event-service");
             }
-            compilation.setEventsId(newCompilationDto.getEvents()); // Сохраняем только ID
         }
 
+        compilation.setEventsId(eventIdsToSave);
         Compilation savedCompilation = compilationRepository.save(compilation);
 
         CompilationDto compilationDto = compilationMapper.toCompilationDto(savedCompilation);
-        compilationDto.setEvents(eventServiceClient.getEventShortDtoSetByIds(savedCompilation.getEventsId()));
+
+        if (!foundEvents.isEmpty()) {
+            compilationDto.setEvents(foundEvents);
+        } else if (!eventIdsToSave.isEmpty()) {
+            try {
+                Set<EventShortDto> eventDtos = eventServiceClient.getEventShortDtoSetByIds(eventIdsToSave);
+                compilationDto.setEvents(eventDtos);
+            } catch (Exception e) {
+                log.warn("Could not fetch events for response");
+                compilationDto.setEvents(Set.of());
+            }
+        }
 
         return compilationDto;
     }
