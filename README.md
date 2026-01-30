@@ -26,7 +26,7 @@
 - `stats-server` - сервис статистики
 
 ### Предварительные требования
-- Java 13 или выше
+- Java 21 или выше
 - Maven 3.6+
 - Docker (опционально)
 
@@ -36,11 +36,91 @@
 3. **Gateway Server** (порт: 8080)
 4. Бизнес-сервисы
 
+Для всех сервисов используются Dockerfile схожего вида
+
+```dockerfile
+FROM eclipse-temurin:21-jdk-alpine
+COPY target/xxx-service-0.0.1-SNAPSHOT.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+```
+где вместо 'xxx' используется название сервиса
+
+## 📂 User Service 
+
+**Управление пользователями системы**. Регистрация, поиск, валидация и удаление пользователей.
+
+### Endpoints (через Gateway: `/admin/users`)
+
+| Метод | Путь | Описание | Параметры |
+|-------|------|----------|-----------|
+| `GET` | `/admin/users` | Список пользователей | `?ids=1,2,3&from=0&size=10` |
+| `GET` | `/admin/users/client/exist/{userId}` | Проверить существование | `-` |
+| `GET` | `/admin/users/client/{userId}` | Пользователь (short) | `-` |
+| `POST` | `/admin/users` | Создать пользователя | `NewUserRequest` |
+| `DELETE` | `/admin/users/{userId}` | Удалить пользователя | `-` |
+
+### Модели данных
+
+**DTO**
+```java
+@Data public class UserDto {
+Long id; String name; String email;
+}
+
+// Для создания
+@Data public class NewUserRequest {
+@NotBlank @Size(min=2, max=250) String name;
+@Email @Size(min=6, max=254) String email;
+}
+
+// Короткая информация (для клиентов)
+@Data public class UserShortDto {
+Long id;
+String name;
+}
+```
+**Entity:**
+```java
+@Entity @Table(name = "users")
+public class User {
+    @Id @GeneratedValue Long id;
+    @Column(unique = true) String email;
+    String name;
+}
+```
+
+
+
+### Клиент сервиса
+```java
+@FeignClient(name = "user-service", path = "/admin/users")
+public interface UserServiceClient {
+@GetMapping("/client/{userId}")
+UserShortDto getUserShortDtoClientById(Long userId);
+
+    @GetMapping("/client/exist/{userId}")
+    void validateUserExistingById(Long userId);
+}
+```
+
 # Category Service
 
 Микросервис для управления категориями событий в системе Explore With Me. Предоставляет полный CRUD функционал для категорий через REST API с разделением на административные и публичные endpoints.
 
 ## 📋 Обзор
+
+### Endpoints (через Gateway: /admin/categories, /categories)
+
+| Метод | Путь | Описание | Параметры |
+|-------|------|----------|-----------|
+| POST | /admin/categories | Создать категорию | NewCategoryDto |
+| PATCH | /admin/categories/{catId} | Обновить категорию | CategoryDto |
+| DELETE | /admin/categories/{catId} | Удалить категорию | - |
+| GET | /admin/categories | Список категорий | ?from=0&size=10 |
+| GET | /categories | Список категорий (public) | ?from=0&size=10 |
+| GET | /categories/{catId} | Категория по ID | - |
+
 
 **Category Service** - сервис управления категориями событий, позволяющий создавать, обновлять, удалять и получать категории. Категории используются для классификации событий в системе (концерты, выставки, спортивные мероприятия и т.д.).
 
@@ -63,6 +143,7 @@ public class Category {
     
     @Column(nullable = false, unique = true)
     private String name; // Название категории (уникальное)
-}```
+}
+```
 
 
