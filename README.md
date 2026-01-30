@@ -1,13 +1,13 @@
 # Explore With Me - Инфраструктурные сервисы
 
 [![Java](https://img.shields.io/badge/Java-21-blue)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2%2B-brightgreen)](https://spring.io/projects/spring-boot)
-[![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2023.0%2B-green)](https://spring.io/projects/spring-cloud)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-brightblue)](https://www.postgresql.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.4-brightgreen)](https://spring.io/projects/spring-boot)
+[![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2023.0.3-green)](https://spring.io/projects/spring-cloud)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-42.7.3-brightblue)](https://www.postgresql.org/)
 
 ## 📋 О проекте
 
-Микросервисная платформа для организации мероприятий с системой управления событиями, категориями, пользователями и отзывами. Проект построен на Spring Cloud с использованием сервис-ориентированной архитектуры.
+Микросервисная платформа для организации мероприятий с системой управления событиями, категориями, пользователями и отзывами. Проект построен на **Spring Cloud** с использованием сервис-ориентированной архитектуры.
 
 ## 🏗️ Архитектура
 
@@ -27,14 +27,15 @@
 
 ### Предварительные требования
 - Java 21 или выше
-- Maven 3.6+
+- Maven 3.8+
+- PostgreSQL 15+
 - Docker (опционально)
 
 ### Порядок запуска сервисов:
 1. **Config Server** (порт случайный)
 2. **Discovery Server** (порт: 8761)
 3. **Gateway Server** (порт: 8080)
-4. Бизнес-сервисы
+4. Бизнес-сервисы (случайный порт)
 
 Для всех сервисов используются Dockerfile схожего вида
 
@@ -45,6 +46,53 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 
 ```
 где вместо 'xxx' используется название сервиса
+
+## 🛠️ Технологический стек (из root pom.xml)
+
+### ☕ Java & Build
+- Java 21
+- Maven 3.8+
+- Spring Boot 3.3.4 (parent)
+
+### 🌐 Spring Ecosystem
+- Spring Boot 3.3.0
+- Spring Cloud 2023.0.3
+- Spring Data JPA
+- Spring Web / Validation
+- Spring Actuator
+
+### 🗄️ Базы данных
+- PostgreSQL 42.7.3
+- H2 (tests)
+
+### 🔌 Интеграции
+- 📡 MapStruct 1.5.5.Final (DTO)
+- 🔒 Lombok 1.18.32
+- ✅ Jakarta Validation 3.0.2
+- 📊 SpringDoc OpenAPI 2.6.0 (Swagger)
+
+### 📡 Микросервисы & Messaging
+- Spring Cloud Circuit Breaker (Resilience4j)
+- Kafka Clients 3.6.1
+- Avro 1.11.3
+- gRPC 1.63.0 + Protobuf 3.23.4
+
+### 📖 API Docs
+- SpringDoc OpenAPI 2.6.0 (Swagger UI)
+
+### 🧪 Тестирование & Quality
+- JUnit 5 (Spring Boot Test)
+- Hamcrest 2.2
+- JaCoCo 0.8.12 (80%+ coverage)
+- SpotBugs 4.8.5.0
+- Checkstyle 10.3
+
+### 🔨 Maven Plugins
+- Compiler 3.11.0
+- Surefire 3.1.2
+- Avro Maven Plugin
+- Protobuf Maven Plugin
+
 
 ## 📂 User Service 
 
