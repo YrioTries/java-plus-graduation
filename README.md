@@ -827,11 +827,11 @@ public interface EventServiceClient {
 
 ### Компоненты Infra
 
-| Сервис | Порт | Назначение |
-|--------|------|------------|
-| `config-server` | **8888** | Централизованное хранение конфигов |
-| `gateway-server` | **9090** | Единая точка входа + роутинг |
-| `eureka-server` | **8761** | Service Discovery + Load Balancing |
+| Сервис | Порт          | Назначение |
+|--------|---------------|------------|
+| `config-server` | **Случайный** | Централизованное хранение конфигов |
+| `gateway-server` | **9090**      | Единая точка входа + роутинг |
+| `eureka-server` | **8761**      | Service Discovery + Load Balancing |
 
 ### Spring Cloud Config Server 
 
