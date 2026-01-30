@@ -1000,9 +1000,7 @@ public class Stat {
 
 1. Инфраструктура (30s)
 docker-compose up eureka-server config-server postgres
-
 2. Core сервисы (2min)
 docker-compose up event-service review-service user-service category-service
-
 3. Остальные (1min)
 docker-compose up request-service compilation-service stats-server gateway-server
