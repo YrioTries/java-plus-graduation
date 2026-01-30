@@ -1,8 +1,9 @@
 # Explore With Me - Инфраструктурные сервисы
 
-[![Java](https://img.shields.io/badge/Java-11%2B-blue)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7%2B-brightgreen)](https://spring.io/projects/spring-boot)
-[![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2021.0%2B-green)](https://spring.io/projects/spring-cloud)
+[![Java](https://img.shields.io/badge/Java-21-blue)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2%2B-brightgreen)](https://spring.io/projects/spring-boot)
+[![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2023.0%2B-green)](https://spring.io/projects/spring-cloud)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-brightblue)](https://www.postgresql.org/)
 
 ## 📋 О проекте
 
