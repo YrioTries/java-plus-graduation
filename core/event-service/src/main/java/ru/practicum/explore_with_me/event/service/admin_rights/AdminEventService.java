@@ -7,7 +7,7 @@ import ru.practicum.explore_with_me.interaction_api.model.event.dto.UpdateEventA
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface EventService {
+public interface AdminEventService {
     List<EventFullDto> getEventsForAdmin(List<Long> users, List<String> states,
                                          List<Long> categories, LocalDateTime rangeStart,
                                          LocalDateTime rangeEnd, Pageable pageable);
