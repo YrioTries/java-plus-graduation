@@ -27,6 +27,7 @@
 2. **Config Server** (порт случайный)
 3. **Gateway Server** (порт: 8080)
 4. **Бизнес-сервисы** (случайный порт)
+5. **Сервис-статистики** (порт: 9090)
 
 ## 🛠️ Технологический стек
 
@@ -177,6 +178,28 @@ Eureka запускается на порту 8761 и предоставляет
 
 ### Модели данных
 
+**Entity:**
+```java
+@Entity
+@Table(name = "users")
+@ToString
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder(toBuilder = true)
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    Long id;
+    @Column(unique = true)
+    String email;
+    String name;
+}
+```
+
 **DTO:**
 ```java
 @Data
@@ -209,29 +232,6 @@ public class UserShortDto {
     private String name;
 }
 ```
-**Entity:**
-```java
-@Entity
-@Table(name = "users")
-@ToString
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@Builder(toBuilder = true)
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    Long id;
-    @Column(unique = true)
-    String email;
-    String name;
-}
-```
-
-
 
 ### Клиент сервиса:
 ```java
@@ -819,7 +819,111 @@ public interface EventServiceClient {
 - **DTO для телеметрии** — передача информации и работа с сервисами
 - **Переиспользуемые модели** для всех микросервисов
 
-#Stats:
+#Infra:
+
+## 🏗️ Infra Module
+
+**Инфраструктурные сервисы платформы**. Spring Cloud Config Server + Gateway + Eureka Discovery.
+
+### Компоненты Infra
+
+| Сервис | Порт | Назначение |
+|--------|------|------------|
+| `config-server` | **8888** | Централизованное хранение конфигов |
+| `gateway-server` | **9090** | Единая точка входа + роутинг |
+| `eureka-server` | **8761** | Service Discovery + Load Balancing |
+
+### Spring Cloud Config Server 
+
+**Центральное хранилище конфигураций** для всех микросервисов.
+
+**application.yaml (Config Server):**
+```yaml
+server:
+  port: 0  # Динамический порт
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          searchLocations:
+            - classpath:config/core/{application}      # event-service.yaml
+            - classpath:config/stats/{application}     # stats-server.yaml  
+            - classpath:config/infra/{application}     # gateway-server.yaml
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+```
+
+**Пример сервиса
+Конфигурация каждого микросервиса:**
+
+**application.yaml (event-service):**
+
+```yaml
+server:
+  port: 0  # Динамический порт (Load Balancer)
+
+spring:
+  datasource:
+    url: jdbc:postgresql://main-service-db:5432/main
+    username: user //Пример
+    password: 12345  //Пример
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+```
+### Архитектура Infra
+1. **Config Server** → раздает `event-service.yaml` при старте сервиса
+2. **Eureka Server** → регистрирует все инстансы сервисов
+3. **Gateway** → роутит `/events/*` → `event-service`
+4. **LoadBalancer** → распределяет нагрузку по инстансам
+
+### Роутинг Gateway (gateway-server.yaml)
+```yaml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: event-service
+          uri: lb://event-service  # Load Balanced
+          predicates:
+            - Path=/events/**,/users/{userId}/events/**
+        - id: review-service  
+          uri: lb://review-service
+          predicates:
+            - Path=/reviews/**,/users/{userId}/reviews/**
+```
+
+**Ключевые особенности:**
+1. **Config Server Native** — локальные YAML файлы
+2. **`port: 0`** — динамическое назначение портов
+3. **`lb://service-name`** — Load Balancing через Eureka
+4. **bootstrap.yaml** — приоритетная загрузка конфигурации
+
+# Stats:
 ## 📊 Сервисы статистики:
 - `stats-client` - **HTTP-клиент для Stats Server** (hit/getStats)
 - `stats-server` - **Сервер статистики** (сбор/хранение/анализ посещений)
