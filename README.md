@@ -32,10 +32,10 @@
 - Docker (опционально)
 
 ### Порядок запуска сервисов:
-1. **Config Server** (порт случайный)
-2. **Discovery Server** (порт: 8761)
+1. **Discovery Server** (порт: 8761) 
+2. **Config Server** (порт случайный)
 3. **Gateway Server** (порт: 8080)
-4. Бизнес-сервисы (случайный порт)
+4. **Бизнес-сервисы** (случайный порт)
 
 Для всех сервисов используются Dockerfile схожего вида
 
@@ -47,7 +47,7 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 ```
 где вместо 'xxx' используется название сервиса
 
-## 🛠️ Технологический стек (из root pom.xml)
+## 🛠️ Технологический стек
 
 ### ☕ Java & Build
 - Java 21
@@ -96,7 +96,7 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 
 ## 📂 User Service 
 
-**Управление пользователями системы**. Регистрация, поиск, валидация и удаление пользователей.
+**Управление пользователями системы**. Создание, поиск, валидация и удаление пользователей.
 
 ### Endpoints (через Gateway: `/admin/users`)
 
@@ -112,28 +112,54 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 
 **DTO**
 ```java
-@Data public class UserDto {
-Long id; String name; String email;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class NewUserRequest {
+    @NotBlank
+    @Size(min = 2, max = 250)
+    private String name;
+    @NotBlank
+    @Email
+    @Size(min = 6, max = 254)
+    private String email;
 }
 
-// Для создания
-@Data public class NewUserRequest {
-@NotBlank @Size(min=2, max=250) String name;
-@Email @Size(min=6, max=254) String email;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserDto {
+    private Long id;
+    private String name;
+    private String email;
 }
 
-// Короткая информация (для клиентов)
-@Data public class UserShortDto {
-Long id;
-String name;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserShortDto {
+    private Long id;
+    private String name;
 }
 ```
 **Entity:**
 ```java
-@Entity @Table(name = "users")
+@Entity
+@Table(name = "users")
+@ToString
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder(toBuilder = true)
 public class User {
-    @Id @GeneratedValue Long id;
-    @Column(unique = true) String email;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    Long id;
+    @Column(unique = true)
+    String email;
     String name;
 }
 ```
@@ -155,8 +181,6 @@ UserShortDto getUserShortDtoClientById(Long userId);
 # Category Service
 
 Микросервис для управления категориями событий в системе Explore With Me. Предоставляет полный CRUD функционал для категорий через REST API с разделением на административные и публичные endpoints.
-
-## 📋 Обзор
 
 ### Endpoints (через Gateway: /admin/categories, /categories)
 
@@ -191,6 +215,170 @@ public class Category {
     
     @Column(nullable = false, unique = true)
     private String name; // Название категории (уникальное)
+}
+```
+
+## 📂 Request Service
+
+**Управление заявками на участие в событиях**. Создание, отмена, массовое подтверждение/отклонение.
+
+### Endpoints (Gateway: `/users/{userId}/**`)
+
+| Метод | Путь | Описание | Параметры |
+|-------|------|----------|-----------|
+| `GET` | `/{userId}/events/{eventId}/requests` | Заявки на событие | - |
+| `GET` | `/{userId}/requests` | Заявки пользователя | - |
+| `POST` | `/{userId}/requests?eventId=1` | Создать заявку | `eventId` |
+| `PATCH` | `/{userId}/events/{eventId}/requests` | Массовое обновление статуса | `EventRequestStatusUpdateRequest` |
+| `PATCH` | `/{userId}/requests/{requestId}/cancel` | Отменить заявку | - |
+| `GET` | `/client/count?eventIds=1,2&requestStatus=CONFIRMED` | Подсчет подтвержденных | `eventIds`, `status` |
+| `GET` | `/{userId}/client/event/{eventId}` | Заявка по user+event | - |
+
+### Модели данных
+
+**Entity:**
+```java
+@Entity @Table("participation_requests")
+@Builder public class ParticipationRequest {
+    @Id 
+    Long id;
+    LocalDateTime created;
+    Long eventId;
+    Long requesterId;
+    RequestStatus status; // PENDING, CONFIRMED, REJECTED, CANCELED
+}
+```
+
+**DTO**
+```java
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ParticipationRequestDto {
+    private Long id;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime created;
+    private Long event;
+    private Long requester;
+    private String status;
+}
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class EventRequestStatusUpdateRequest {
+    private Set<Long> requestIds;
+    private RequestStatus status;
+}
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class EventRequestStatusUpdateResult {
+    private List<ParticipationRequestDto> confirmedRequests;
+    private List<ParticipationRequestDto> rejectedRequests;
+}
+```
+
+
+### Клиент сервиса
+```java
+@FeignClient(name = "request-service", path = "/users")
+public interface RequestServiceClient {
+    @GetMapping("/client/count")
+    Map<Long, List<ParticipationRequestDto>> getConfirmedRequestsCount(
+            List<Long> eventIds, RequestStatus status);
+
+    @GetMapping("/{userId}/client/event/{eventId}")
+    ParticipationRequestDto getByUserAndEvent(Long userId, Long eventId);
+}
+```
+
+## 📂 Review Service
+
+### Endpoints (Gateway: /admin/reviews, /users/{userId}/reviews, /reviews)
+
+| Метод | Путь | Описание | Доступ | Параметры |
+|-------|------|----------|--------|-----------|
+| `GET` | `/admin/reviews` | Поиск отзывов | Admin | `text, users, events, from=0, size=10` |
+| `DELETE` | `/admin/reviews/{reviewId}` | Удалить отзыв | Admin | - |
+| `POST` | `/users/{userId}/reviews/events/{eventId}` | Создать отзыв | Private | `NewReviewDto` |
+| `PATCH` | `/users/{userId}/reviews/{reviewId}` | Обновить отзыв | Private | `UpdateReviewDto` |
+| `DELETE` | `/users/{userId}/reviews/{reviewId}/events/{eventId}` | Удалить свой отзыв | Private | - |
+| `GET` | `/users/{userId}/reviews/{reviewId}` | Мой отзыв по ID | Private | - |
+| `GET` | `/users/{userId}/reviews` | Мои отзывы | Private | - |
+| `GET` | `/reviews/{eventId}` | Отзывы события | Public | `?from=0&size=10` |
+
+### Модели данных
+
+**Entity:**
+```java
+@Entity
+@Table(name = "reviews")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Review {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "review_id")
+    private Long id;
+    @Column(name = "text", nullable = false)
+    private String text;
+    @ManyToOne
+    @JoinColumn(name = "event_id", nullable = false)
+    private Long eventId;
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    private Long authorId;
+    @Column(name = "created_on", nullable = false)
+    @CreationTimestamp
+    private LocalDateTime createdOn;
+    @UpdateTimestamp
+    @Column(name = "last_updated_on")
+    private LocalDateTime lastUpdatedOn;
+}
+```
+
+**DTO**
+```java
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class NewReviewDto {
+    @NotBlank
+    @Size(min = 2, max = 2000)
+    private String text;
+}
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ReviewDto {
+    private Long id;
+    private String text;
+    private Long eventId;
+    private Long authorId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdOn;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime lastUpdatedOn;
+}
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UpdateReviewDto {
+    @NotBlank
+    @Size(min = 2, max = 2000)
+    private String text;
 }
 ```
 
