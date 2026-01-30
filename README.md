@@ -946,7 +946,7 @@ spring:
 @Autowired StatsClient statsClient;
 
 @GetMapping("/events")
-public List<EventShortDto> getEvents(...) {
+public List<EventShortDto> getEvents() {
     // логика
     EndpointHitDto hit = EndpointHitDto.builder()
         .app("ewm-main-service")
