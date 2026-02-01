@@ -9,12 +9,31 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <modules>
-        <module>main-service</module>
-    </modules>
-
     <artifactId>core</artifactId>
     <name>core</name>
     <packaging>pom</packaging>
+
+    <modules>
+        <module>user-service</module>
+        <module>interaction-api</module>
+        <module>category-service</module>
+        <module>event-service</module>
+        <module>review-service</module>
+        <module>compilation-service</module>
+        <module>request-service</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
