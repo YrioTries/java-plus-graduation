@@ -20,7 +20,8 @@
 		<module>stats</module>
 		<module>infra</module>
 		<module>core</module>
-	</modules>
+        <module>telemetry</module>
+    </modules>
 
 	<properties>
 		<!-- Java environment settings -->
