@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package stats.service.collector;
+
+option java_multiple_files = true;
+option java_package = "stats.service.dashboard";
+
+import "telemetry/messages/recommendations.proto";
+
+service RecommendationsController {
+    rpc GetRecommendationsForUser (messages.UserPredictionsRequestProto)
+            returns (stream messages.RecommendedEventProto);
+
+    rpc GetSimilarEvents (telemetry.messages.SimilarEventsRequestProto)
+            returns (stream telemetry.messages.RecommendedEventProto);
+
+    rpc GetInteractionsCount (telemetry.messages.InteractionsCountRequestProto)
+            returns (stream telemetry.messages.RecommendedEventProto);
+}
