@@ -3,6 +3,7 @@ package ru.practicum.analyzer.service.similarity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.analyzer.model.dao.Similarity;
+import ru.practicum.analyzer.model.repository.SimilarityRepository;
 import ru.practicum.ewm.stats.avro.EventSimilarityAvro;
 
 import java.time.LocalDateTime;
