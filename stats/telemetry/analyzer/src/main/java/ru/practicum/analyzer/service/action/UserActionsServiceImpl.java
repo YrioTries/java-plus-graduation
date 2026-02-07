@@ -2,8 +2,8 @@ package ru.practicum.analyzer.service.action;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.dal.model.Interaction;
-import ru.practicum.dal.repository.InteractionRepository;
+import ru.practicum.analyzer.model.dao.Interaction;
+import ru.practicum.analyzer.model.repository.InteractionRepository;
 import ru.practicum.ewm.stats.avro.ActionTypeAvro;
 import ru.practicum.ewm.stats.avro.UserActionAvro;
 

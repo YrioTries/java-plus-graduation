@@ -1,4 +1,4 @@
-package ru.practicum.analyzer.dao;
+package ru.practicum.analyzer.model.dao;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,22 +15,22 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "similarities")
+@Table(name = "interactions")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Similarity {
+public class Interaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name = "event_id1", nullable = false)
-    private Long eventId1;
-    @Column(name = "event_id2", nullable = false)
-    private Long eventId2;
-    @Column(name = "similarity", nullable = false)
-    private Double similarity;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+    @Column(name = "event_id", nullable = false)
+    private Long eventId;
+    @Column(name = "rating", nullable = false)
+    private Double rating;
     @Column(name = "ts", nullable = false)
     private LocalDateTime ts;
 }

@@ -6,12 +6,12 @@ import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+import ru.practicum.analyzer.service.recommendation.RecommendationsService;
 import ru.practicum.ewm.stats.proto.InteractionsCountRequestProto;
 import ru.practicum.ewm.stats.proto.RecommendationsControllerGrpc.RecommendationsControllerImplBase;
 import ru.practicum.ewm.stats.proto.RecommendedEventProto;
 import ru.practicum.ewm.stats.proto.SimilarEventsRequestProto;
 import ru.practicum.ewm.stats.proto.UserPredictionsRequestProto;
-import ru.practicum.service.RecommendationsService;
 
 @Slf4j
 @GrpcService
