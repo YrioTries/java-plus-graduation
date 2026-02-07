@@ -10,7 +10,7 @@
     <artifactId>avro-schemas</artifactId>
     <name>avro-schemas</name>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
