@@ -10,7 +10,7 @@
     <artifactId>proto-schemas</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>proto-schemas</name>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <properties>
         <grpc.version>1.63.0</grpc.version>
