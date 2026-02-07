@@ -17,10 +17,9 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>stats</module>
-		<module>infra</module>
 		<module>core</module>
-        <module>telemetry</module>
+		<module>infra</module>
+		<module>stats</module>
     </modules>
 
 	<properties>

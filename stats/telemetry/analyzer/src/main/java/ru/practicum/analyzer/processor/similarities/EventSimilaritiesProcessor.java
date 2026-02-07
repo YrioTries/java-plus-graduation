@@ -7,6 +7,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Component;
+import ru.practicum.analyzer.processor.similarities.config.EventSimilaritiesKafkaConfig;
+import ru.practicum.analyzer.service.similarity.EventSimilarityService;
 import ru.practicum.ewm.stats.avro.EventSimilarityAvro;
 
 import java.util.List;

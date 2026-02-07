@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import ru.practicum.processor.actions.UserActionsProcessor;
-import ru.practicum.processor.similarities.EventSimilaritiesProcessor;
+import ru.practicum.analyzer.processor.actions.UserActionsProcessor;
+import ru.practicum.analyzer.processor.similarities.EventSimilaritiesProcessor;
 
 @Slf4j
 @Component

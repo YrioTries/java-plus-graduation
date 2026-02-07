@@ -7,9 +7,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>avro</artifactId>
-    <name>avro</name>
+    <artifactId>avro-schemas</artifactId>
+    <name>avro-schemas</name>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <dependencies>
         <dependency>

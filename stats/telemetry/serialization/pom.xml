@@ -8,12 +8,12 @@
     </parent>
 
     <artifactId>serialization</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>serialization</name>
     <packaging>pom</packaging>
 
-    <name>serialization</name>
-    <url>http://maven.apache.org</url>
     <modules>
-        <module>avro</module>
+        <module>avro-schemas</module>
         <module>proto-schemas</module>
     </modules>
 

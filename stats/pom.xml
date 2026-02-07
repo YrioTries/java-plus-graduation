@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>stats</artifactId>
-    <name>stat</name>
+    <name>stats</name>
     <packaging>pom</packaging>
 
     <modules>

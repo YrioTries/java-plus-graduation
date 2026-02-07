@@ -8,6 +8,8 @@
     </parent>
 
     <artifactId>analyzer</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>analyzer</name>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -91,7 +93,7 @@
 
         <dependency>
             <groupId>ru.practicum</groupId>
-            <artifactId>avro</artifactId>
+            <artifactId>avro-schemas</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
@@ -110,6 +112,10 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.devh</groupId>
+            <artifactId>grpc-server-spring-boot-starter</artifactId>
         </dependency>
     </dependencies>
 
