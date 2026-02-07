@@ -8,14 +8,14 @@ grpc:
 
 collector:
   kafka:
-    properties:
-      bootstrap:
-        servers: localhost:9092
-      key:
-        serializer: org.apache.kafka.common.serialization.StringSerializer
-      value:
-        serializer: ru.practicum.kafka.serializer.GeneralAvroSerializer
+    bootstrap-servers: ${spring.kafka.bootstrap-servers}
     topic: stats.user-actions.v1
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: ru.practicum.kafka.serializer.GeneralAvroSerializer
+    acks: 1
+    linger-ms: 5
+    batch-size: 16384
+    buffer-memory: 33554432
 
 management:
   endpoints:
