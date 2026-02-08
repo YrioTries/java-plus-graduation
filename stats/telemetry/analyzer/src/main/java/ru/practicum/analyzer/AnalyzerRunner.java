@@ -25,5 +25,4 @@ public class AnalyzerRunner implements CommandLineRunner {
         eventSimThread.setName("EventSimilarityProcessorThread");
         eventSimThread.start();
     }
-
 }
