@@ -22,4 +22,5 @@ public class KafkaConfig {
         System.out.println("key.serializer: " + properties.getProperty("key.serializer"));
         System.out.println("========================");
     }
+
 }
