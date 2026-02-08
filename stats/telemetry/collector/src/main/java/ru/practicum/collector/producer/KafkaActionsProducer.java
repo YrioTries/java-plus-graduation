@@ -3,8 +3,8 @@ package ru.practicum.collector.producer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.stereotype.Component;
-import ru.practicum.ewm.stats.avro.UserActionAvro;
 import ru.practicum.collector.config.KafkaConfig;
+import ru.practicum.ewm.stats.avro.UserActionAvro;
 
 @Component
 public class KafkaActionsProducer implements AutoCloseable {

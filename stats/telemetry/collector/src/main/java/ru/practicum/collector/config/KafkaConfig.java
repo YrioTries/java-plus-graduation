@@ -2,25 +2,27 @@ package ru.practicum.collector.config;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.springframework.stereotype.Component;
+import ru.practicum.avro.serializer.GeneralAvroSerializer;
 
 import java.util.Properties;
 
 @Getter
-@Setter
-@ConfigurationProperties("collector.kafka")
+@Component
 public class KafkaConfig {
-    private Properties properties = new Properties();
-    private String topic;
+    private Properties properties;
+    private final String topic = "stats.user-actions.v1";
 
     @PostConstruct
-    public void debug() {
-        System.out.println("=== KAFKA CONFIG DEBUG ===");
-        System.out.println("properties: " + properties);
-        System.out.println("keys: " + properties.stringPropertyNames());
-        System.out.println("key.serializer: " + properties.getProperty("key.serializer"));
-        System.out.println("========================");
+    public void init() {
+        this.properties = new Properties();
+        this.properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        this.properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer"); // ← ИСПРАВЛЕНО
+        this.properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GeneralAvroSerializer.class.getName());
+        this.properties.put(ProducerConfig.ACKS_CONFIG, "1");
+        this.properties.put(ProducerConfig.LINGER_MS_CONFIG, 5);
+        this.properties.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
+        this.properties.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432);
     }
-
 }
