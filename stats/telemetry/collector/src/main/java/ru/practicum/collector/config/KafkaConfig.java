@@ -10,8 +10,7 @@ import java.util.Properties;
 @Getter
 @Setter
 @ConfigurationProperties("collector.kafka")
-@RequiredArgsConstructor
 public class KafkaConfig {
-    private final Properties properties;
-    private final String topic;
+    private Properties properties = new Properties();
+    private String topic;
 }
