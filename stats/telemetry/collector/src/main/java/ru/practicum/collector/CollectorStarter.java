@@ -8,7 +8,6 @@ import ru.practicum.collector.config.KafkaConfig;
 
 @Slf4j
 @SpringBootApplication
-@EnableConfigurationProperties(KafkaConfig.class)
 public class CollectorStarter {
     public static void main(String[] args) {
         SpringApplication.run(CollectorStarter.class, args);
