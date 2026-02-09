@@ -18,7 +18,7 @@ public class KafkaConfig {
     public void init() {
         this.properties = new Properties();
         this.properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        this.properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer"); // ← ИСПРАВЛЕНО
+        this.properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         this.properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GeneralAvroSerializer.class.getName());
         this.properties.put(ProducerConfig.ACKS_CONFIG, "1");
         this.properties.put(ProducerConfig.LINGER_MS_CONFIG, 5);
