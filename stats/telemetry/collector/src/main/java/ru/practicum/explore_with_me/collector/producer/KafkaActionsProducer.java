@@ -43,7 +43,7 @@ public class KafkaActionsProducer {
 
     private String generateKey(UserActionAvro userAction) {
         // Генерация ключа для обеспечения порядка сообщений
-        return userAction.getUserId() != null ?
+        return userAction.getUserId().equals(null) ?
                 userAction.getUserId().toString() :
                 "anonymous";
     }
