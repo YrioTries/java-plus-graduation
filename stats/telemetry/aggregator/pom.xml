@@ -87,6 +87,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <mainClass>ru.practicum.explore_with_me.aggregator.AggregatorStarter</mainClass>
+                </configuration>
             </plugin>
 
             <plugin>

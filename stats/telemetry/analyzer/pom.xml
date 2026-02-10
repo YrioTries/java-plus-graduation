@@ -125,7 +125,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>ru.practicum.analyzer.AnalyzerStarter</mainClass>
+                    <mainClass>ru.practicum.explore_with_me.analyzer.AnalyzerStarter</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
