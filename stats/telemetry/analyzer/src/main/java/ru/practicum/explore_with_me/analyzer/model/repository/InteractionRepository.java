@@ -13,7 +13,7 @@ public interface InteractionRepository extends JpaRepository<Interaction, Long> 
     Optional<Interaction> findByEventIdAndUserId(Long eventId, Long userId);
 
     @Query("""
-            SELECT new ru.practicum.dal.model.RecommendedEventQueryRecord(i.eventId, sum(i.rating))
+            SELECT new ru.practicum.explore_with_me.analyzer.model.dao.RecommendedEventQueryRecord(i.eventId, sum(i.rating))
               FROM Interaction i
              WHERE i.eventId IN (:eventIds)
              GROUP BY i.eventId

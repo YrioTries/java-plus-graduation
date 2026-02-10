@@ -14,7 +14,7 @@ public interface SimilarityRepository extends JpaRepository<Similarity, Long> {
     Optional<Similarity> findByEventId1AndEventId2(Long eventId1, Long eventId2);
 
     @Query("""
-            SELECT new ru.practicum.dal.model.RecommendedEventQueryRecord(
+            SELECT new ru.practicum.explore_with_me.analyzer.model.dao.RecommendedEventQueryRecord(
                      CASE WHEN s.eventId1 = :eventId THEN s.eventId2 ELSE s.eventId1 END,
                      s.similarity)
               FROM Similarity s
