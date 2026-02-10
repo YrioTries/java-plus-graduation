@@ -15,6 +15,7 @@ import ru.practicum.explore_with_me.collector.util.Utils;
 @Slf4j
 @RequiredArgsConstructor
 public class UserActionServiceImpl implements UserActionService {
+
     private final KafkaActionsProducer producer;
 
     @Override
