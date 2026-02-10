@@ -13,7 +13,7 @@ aggregator:
       key:
         serializer: org.apache.kafka.common.serialization.StringSerializer
       value:
-        serializer: ru.practicum.kafka.serializer.GeneralAvroSerializer
+        serializer: ru.practicum.avro.serializer.GeneralAvroSerializer
     topic: stats.events-similarity.v1
   kafka-consumer:
     properties:
