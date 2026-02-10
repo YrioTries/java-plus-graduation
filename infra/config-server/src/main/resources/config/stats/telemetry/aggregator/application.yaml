@@ -19,7 +19,7 @@ aggregator:
     properties:
       bootstrap.servers: localhost:9092
       key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value.deserializer: ru.practicum.kafka.deserializer.UserActionDeserializer
+      value.deserializer: ru.practicum.avro.deserializer.UserActionDeserializer
       client.id: aggregator
       group.id: aggregator-group
     topic: stats.user-actions.v1

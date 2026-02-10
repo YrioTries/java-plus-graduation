@@ -28,7 +28,7 @@ analyzer:
     properties:
       bootstrap.servers: localhost:9092
       key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value.deserializer: ru.practicum.kafka.deserializer.UserActionDeserializer
+      value.deserializer: ru.practicum.avro.deserializer.UserActionDeserializer
       client.id: analyzer
       group.id: analyzer-actions-group
     topic: stats.user-actions.v1
@@ -37,7 +37,7 @@ analyzer:
     properties:
       bootstrap.servers: localhost:9092
       key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value.deserializer: ru.practicum.kafka.deserializer.EventSimilarityDeserializer
+      value.deserializer: ru.practicum.avro.deserializer.EventSimilarityDeserializer
       client.id: analyzer
       group.id: analyzer-similarity-group
     topic: stats.events-similarity.v1
