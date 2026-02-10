@@ -7,14 +7,6 @@ collector:
     producer:
       properties:
         bootstrap.servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-        client.id: telemetry.collector
-        key.serializer: org.apache.kafka.common.serialization.StringSerializer
-        value.serializer: ru.practicum.avro.serializer.GeneralAvroSerializer  # Единый путь!
-        linger.ms: 5
-        batch.size: 16384
-        buffer.memory: 33554432
-        acks: 1
-        retries: 3
       topic: stats.user-actions.v1
 
 management:
