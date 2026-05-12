@@ -17,10 +17,10 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>stats</module>
-		<module>infra</module>
 		<module>core</module>
-	</modules>
+		<module>infra</module>
+		<module>stats</module>
+    </modules>
 
 	<properties>
 		<!-- Java environment settings -->
@@ -213,28 +213,9 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.mapstruct</groupId>
-				<artifactId>mapstruct</artifactId>
-				<version>${mapstruct.version}</version>
-			</dependency>
-
-			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok-mapstruct-binding</artifactId>
 				<version>${lombok-mapstruct-binding.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.postgresql</groupId>
-				<artifactId>postgresql</artifactId>
-				<version>${postgresql.version}</version>
-				<scope>runtime</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>org.projectlombok</groupId>
-				<artifactId>lombok</artifactId>
-				<version>${lombok.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -443,5 +424,4 @@
 			</build>
 		</profile>
 	</profiles>
-
 </project>
