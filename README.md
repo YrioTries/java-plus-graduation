@@ -1,4 +1,5 @@
-# Explore With Me - Инфраструктурные сервисы
+# Java-plus-graduation
+ - Инфраструктурные сервисы
 
 [![Java](https://img.shields.io/badge/Java-21-blue)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.4-brightgreen)](https://spring.io/projects/spring-boot)
